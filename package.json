@@ -12,8 +12,10 @@
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-alpha.6",
     "@tailwindcss/vite": "^4.0.14",
+    "motion": "^12.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-img-mapper": "^2.0.0",
     "react-router": "^6.30.0",
     "react-router-dom": "^6.30.0",
     "tailwindcss": "^4.0.14"

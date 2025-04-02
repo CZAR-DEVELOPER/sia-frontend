@@ -3,14 +3,13 @@ import './container_component.css';
 
 interface ContainerComponentProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-const ContainerComponent: React.FC<ContainerComponentProps> = ({ children }) => {
+const ContainerComponent: React.FC<ContainerComponentProps> = ({ children, className }) => {
   return <>
   
-    <div className=' mx-0'>
-        <div className="container">{children}</div>
-    </div>
+        <div className={`container mx-0 ${className}`}>{children}</div>
   </>;
 };
 
