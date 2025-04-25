@@ -10,7 +10,7 @@ interface NavbarProps {
 
 const NavbarComponent: React.FC<NavbarProps> = ({title=""}) => {
   return (
-    <nav className="grid grid-cols-3 px-8 py-4 sticky top-0 bg-white/75 backdrop-blur-sm  z-50 ">
+    <nav className="grid grid-cols-3 px-8 py-4 sticky top-0 bg-white/75 backdrop-blur-sm  z-30 ">
       <Link to={"/"} className="navbar-logo">
         <img src={LogoSIA} className="h-10"  alt="Logo SIA" />
       </Link>

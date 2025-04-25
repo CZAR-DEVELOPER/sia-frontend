@@ -18,7 +18,7 @@ const HomePage: React.FC = () => {
 
   //HOOKS
 
-  const [sidebarController, setSidebarController] = React.useState({id:"", isOpen: false, title: '', floors: [{name: "Piso 1", id: "1", isFloor: true}], closeButton: false});
+  const [sidebarController, setSidebarController] = React.useState({id:"", isOpen: false, title: '', floors: [{name: "Piso 1", id: "1", isFloor: true, customUrl: ""}], closeButton: false});
   const [mouseFollowerController, setMouseFollowerController] = React.useState({isVisible: false, label: ''});
 
   // GET JSON FROM BELOW URL AS AN EXAMPLE
@@ -28,10 +28,10 @@ const HomePage: React.FC = () => {
       id: "B",
       label:"Edificio B",
       floors: [
-        {name: "Piso 1", id: "1", isFloor: true},
-        {name: "Piso 2", id: "2", isFloor: true},
-        {name: "Piso 3", id: "3", isFloor: true},
-        {name: "Bombeo", id: "Bombeo", isFloor: false},
+        {name: "Piso 1", id: "1", isFloor: true, customUrl: ''},
+        {name: "Piso 2", id: "2", isFloor: true, customUrl: ''},
+        {name: "Piso 3", id: "3", isFloor: true, customUrl: ''},
+        {name: "Bombeo", id: "Bombeo", isFloor: false, customUrl: ''},
       ],
       shape: "poly",
       fillColor: "#ffffff40",
@@ -60,9 +60,9 @@ const HomePage: React.FC = () => {
       id: "F",
       label:"Edificio F",
       floors: [
-        {name: "Bombeo", id: "Bombeo", isFloor: false},
-        {name: "Chillers", id: "Chillers", isFloor: false},
-        {name: "Torres de enfriamiento", id: "Torres de enfriamiento", isFloor: false},
+        {name: "Bombeo", id: "Bombeo", isFloor: false, customUrl: ''},
+        {name: "Chillers", id: "Chillers", isFloor: false,  customUrl: 'chillers'},
+        {name: "Torres de enfriamiento", id: "Torres de enfriamiento", isFloor: false, customUrl: ''},
       ],
       shape: "poly",
       name: "st1",
@@ -163,7 +163,7 @@ const HomePage: React.FC = () => {
 
         {sidebarController.floors.map((floor) => (
           <Link
-            to={ floor.isFloor ? `/floor?building=${sidebarController.id}&level=${floor.id}`: '/area'}
+            to={ floor.isFloor ? `/floor?building=${sidebarController.id}&level=${floor.id}`: floor.customUrl}
             key={floor.id}
             className="btn btn-primary cursor-pointer flex flex-row items-center mb-2 hover:opacity-50"
             onClick={() => console.log(`Piso ${floor}`)}

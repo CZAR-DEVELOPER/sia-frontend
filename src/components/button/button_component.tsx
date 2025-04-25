@@ -42,7 +42,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({ onClick, children, disabled = 
             buttonStyle += "bg-black text-white px-4";
             break;
         case 'icon':
-            buttonStyle += "bg-gray-100 text-black min-w-10 flex justify-center items-center ";
+            buttonStyle += "bg-gray-200 text-black min-w-10 flex justify-center items-center ";
             break;
         default:
             buttonStyle += "bg-black text-white ";
@@ -52,7 +52,7 @@ const ButtonComponent: React.FC<ButtonProps> = ({ onClick, children, disabled = 
 
     return (
         <div className='flex flex-col'>
-            <button type={type} className={`cursor-pointer active:opacity-75 rounded-full min-h-10 ${buttonStyle} ${className}`} onClick={onClick} disabled={disabled}>
+            <button type={type} className={`cursor-pointer active:opacity-75 rounded-full min-h-10 ${buttonStyle} ${className} ${disabled == true ? 'opacity-25':''}`} onClick={onClick} disabled={disabled}>
                 {children}
             </button>
         </div>
