@@ -62,7 +62,7 @@ const HomePage: React.FC = () => {
       floors: [
         {name: "Bombeo", id: "Bombeo", isFloor: false, customUrl: ''},
         {name: "Chillers", id: "Chillers", isFloor: false,  customUrl: 'chillers'},
-        {name: "Torres de enfriamiento", id: "Torres de enfriamiento", isFloor: false, customUrl: ''},
+        {name: "Torres de enfriamiento", id: "Torres de enfriamiento",  isFloor: false,  customUrl: 'cooling-towers'},
       ],
       shape: "poly",
       name: "st1",
@@ -107,7 +107,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <NavbarComponent title="Edificios" />
+      <NavbarComponent title="Edificios" goBackButton={false} />
       <ContainerComponent className="grow flex flex-col">
         <section>
           <h1 className="text-4xl">Corporativo Televisa Santa fé</h1>

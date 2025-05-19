@@ -4,24 +4,47 @@ import LogoSIA from "../../assets/brand/logo_sia.svg";
 import { Link } from "react-router-dom";
 
 interface NavbarProps {
-    title?: string;
+  title?: string;
+  goBackButton?: boolean;
 }
 
-
-const NavbarComponent: React.FC<NavbarProps> = ({title=""}) => {
+const NavbarComponent: React.FC<NavbarProps> = ({
+  title = "",
+  goBackButton = true,
+}) => {
   return (
     <nav className="grid grid-cols-3 px-8 py-4 sticky top-0 bg-white/75 backdrop-blur-sm  z-30 ">
-      <Link to={"/"} className="navbar-logo">
-        <img src={LogoSIA} className="h-10"  alt="Logo SIA" />
-      </Link>
+      <div className="flex flex-row items-center">
+        {goBackButton && (
+          <ButtonComponent
+            onClick={() => {
+              window.history.back();
+            }}
+            style="icon"
+            className="mr-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+              
+                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"
+              />
+            </svg>
+          </ButtonComponent>
+        )}
+        <Link to={"/"} className="navbar-logo">
+          <img src={LogoSIA} className="h-10" alt="Logo SIA" />
+        </Link>
+      </div>
 
-        <div className="text-center text-2xl">
-            {title}
-        </div>
+      <div className="text-center text-2xl">{title}</div>
 
       <div className="flex flex-row-reverse">
-       
-
         <ButtonComponent size="sm" style="solid">
           Cerrar sesión
         </ButtonComponent>

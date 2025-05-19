@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import AvatarComponent from "../../components/avatar/avatar_component";
 import ButtonComponent from "../../components/button/button_component";
 import VavStandby from "../../assets/3d_models/vav/vav_status_standby.png";
+import VavWorking from "../../assets/3d_models/vav/vav_status_working.webm";
 
 interface StatusModel {
   label: string;
@@ -91,9 +92,18 @@ const VavPage: React.FC = () => {
           </div>
 
           {/* ANIMATIONS SECTIONS */}
-          <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
-            <img src={VavStandby} alt="UMA" className=" h-full object-fit" />
-          </div>
+            <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
+            {/* <img src={VavStandby} alt="UMA" className=" h-full object-fit" /> */}
+            
+            <video
+              src={VavWorking}
+              autoPlay
+              loop
+              muted
+              controls={false}
+              className="h-full object-fit"
+              ></video>
+            </div>
 
           {/* 📉 Data section */}
           <section>

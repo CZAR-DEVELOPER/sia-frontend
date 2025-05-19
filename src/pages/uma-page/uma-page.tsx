@@ -2,8 +2,9 @@ import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
 import ContainerComponent from "../../components/container/container_component";
 import ButtonComponent from "../../components/button/button_component";
-import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
 import AvatarComponent from "../../components/avatar/avatar_component";
+import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
+import UmaWorking from "../../assets/3d_models/uma/uma_status_working.webm";
 
 interface StatusModel {
   label: string;
@@ -98,9 +99,20 @@ const UmaPage: React.FC = () => {
           </div>
 
           {/* ANIMATIONS SECTIONS */}
-          <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
-            <img src={UmaStandBy} alt="UMA" className=" h-full object-fit" />
-          </div>
+            <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
+            {umaState.isPowerOn ? (
+              <video
+              src={UmaWorking}
+              autoPlay
+              loop
+              muted
+              controls={false}
+              className="h-full object-fit"
+              ></video>
+            ) : (
+              <img src={UmaStandBy} alt="UMA" className="h-full object-fit" />
+            )}
+            </div>
 
           {/* 📉 Data section */}
           <section

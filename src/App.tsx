@@ -5,6 +5,7 @@ import FloorPage from './pages/floor-page/floor-page'
 import UmaPage from './pages/uma-page/uma-page';
 import VavPage from './pages/vav_page/vav_page';
 import ChillersPage from './pages/chillers-page/chilers-page';
+import CoolingTowersPage from './pages/cooling-towers-page/cooling-towers-page';
 
 
 const router = createBrowserRouter(
@@ -29,6 +30,11 @@ const router = createBrowserRouter(
     {
       path: '/chillers',
       element: <ChillersPage />,
+    },
+
+    {
+      path: '/cooling-towers',
+      element: <CoolingTowersPage />,
     },
   ],
   {

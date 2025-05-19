@@ -19,6 +19,8 @@ import NavbarComponent from "../../components/navbar/navbar-component";
 import FloorMapComponent from "../../components/floor-maps/floor-map-component";
 import FloorMapEditorComponent from "../../components/floor_map_editor/floor_map_editor_component";
 import FloorSidebarComponent from "../../components/floors_sidebar/floors_sidebar_component";
+import { useAllUmas } from "../../services/uma/uma_hooks";
+import LoadingComponent from "../../components/loading/loading_component";
 //import ButtonComponent from "../../components/button/button_component";
 
 interface Point {
@@ -34,6 +36,7 @@ interface Point {
 const FloorPage: React.FC = () => {
   //Hooks
   const [isEditing, setIsEditing] = React.useState(false);
+  const { umas, loading } = useAllUmas('B'); 
 
   
 
@@ -1176,38 +1179,44 @@ const FloorPage: React.FC = () => {
       {/* SIDEBAR */}
       <FloorSidebarComponent defaultVisible></FloorSidebarComponent>
       
+      {/* Loading */}
+    
 
       {/* MainContainer */}
       <ContainerComponent className="flex justify-center grow  ">
         <div className="height-100 h-150 xl:h-150 2xl:h-200 self-center pb-10">
-          {isEditing ? (
-            <FloorMapEditorComponent
-              imageUrl={currentMapHelper}
-              currentPointsList={currentMapPoints}
-              onPointClick={(point) => {
-                console.log(point);
-              }}
-            ></FloorMapEditorComponent>
+          {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <LoadingComponent></LoadingComponent>
+        </div>
+          ) : isEditing ? (
+        <FloorMapEditorComponent
+          imageUrl={currentMapHelper}
+          currentPointsList={currentMapPoints}
+          onPointClick={(point) => {
+            console.log(point);
+          }}
+        ></FloorMapEditorComponent>
           ) : (
-            <FloorMapComponent
-              pointsList={currentMapPoints  || []}
-              imageUrl={currentMap}
-              currentBuilding={building!}
-              currentLevel={level!}
-            ></FloorMapComponent>
+        <FloorMapComponent
+          pointsList={currentMapPoints || []}
+          imageUrl={currentMap}
+          currentBuilding={building!}
+          currentLevel={level!}
+        ></FloorMapComponent>
           )}
         </div>
         <div>
           <div className="fixed bottom-8 right-8">
-            <ButtonComponent
-            style="outline"
-              size="sm"
-              onClick={() => {
-                setIsEditing(!isEditing);
-              }}
-            >
-              {isEditing ? "Listo" : "Editar"}
-            </ButtonComponent>
+        <ButtonComponent
+          style="outline"
+          size="sm"
+          onClick={() => {
+            setIsEditing(!isEditing);
+          }}
+        >
+          {isEditing ? "Listo" : "Editar"}
+        </ButtonComponent>
           </div>
         </div>
       </ContainerComponent>

@@ -1,7 +1,6 @@
 import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
 import ContainerComponent from "../../components/container/container_component";
-import ButtonComponent from "../../components/button/button_component";
 import ChillerStandby from "../../assets/3d_models/chiller/chiller_standby.png";
 
 interface StatusModel {
@@ -19,6 +18,24 @@ const ChillersPage: React.FC = () => {
     temperatura_retorno_helada: 0,
     temperatura_retorno_condensados: 0,
   });
+
+  const chillersList = [
+    {
+      id: "chiller_1",
+      label: "Chiller 1",
+      status: true,
+     },
+     {
+      id: "chiller_2",
+      label: "Chiller 2",
+      status: true,
+     },
+     {
+      id: "chiller_3",
+      label: "Chiller 3",
+      status: true,
+     }
+  ]
 
   const status: StatusModel[] = [
     {
@@ -41,7 +58,7 @@ const ChillersPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-col">
       {/* Navbar */}
-      <NavbarComponent title="Torre de chillers"></NavbarComponent>
+      <NavbarComponent title="Visualizacion de chillers"></NavbarComponent>
 
       <div className="grid grid-cols-[1fr_auto] h-full ">
         {/* Main Content */}
@@ -49,136 +66,26 @@ const ChillersPage: React.FC = () => {
           <div className="flex justify-between mb-4">
             <div>
               <h1 className="text-2xl ">Cuarto de chillers</h1>
+              <p className="opacity-50">Edificio F - Piso 2</p>
             </div>
           </div>
 
           {/* ANIMATIONS SECTIONS */}
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div>
-             
-
+            {chillersList.map((chiller) => (
+              <div key={chiller.id}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl my-4 text-center">Chiller 1</h2>
-
-                <ButtonComponent
-                  size="sm"
-                  style={chillersState.chiller_1 ? "solid" : "outline"}
-                  className="flex items-center justify-center"
-                  onClick={() => {
-                    setChillerState({
-                      ...chillersState,
-                      chiller_1: !chillersState.chiller_1,
-                    });
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M7.5 1v7h1V1z" />
-                    <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-                  </svg>
-                  <span className="ms-2">
-                    {chillersState.chiller_1 ? "Apagar" : "Encender"}
-                  </span>
-                </ButtonComponent>
+                <h2 className="text-xl my-4 text-center">{chiller.label}</h2>
               </div>
-              <div className="bg-gray-50/25  w-full h-65 my-6 flex items-center justify-center ">
+              <div className="bg-gray-50/25 w-full h-65 my-6 flex items-center justify-center">
                 <img
-                  src={ChillerStandby}
-                  alt="UMA"
-                  className=" h-full object-contain"
+                src={ChillerStandby}
+                alt={chiller.label}
+                className="h-full object-contain"
                 />
               </div>
-            </div>
-
-
-            <div>
-             
-
-             <div className="flex justify-between items-center">
-               <h2 className="text-xl my-4 text-center">Chiller 2</h2>
-
-               <ButtonComponent
-                 size="sm"
-                 style={chillersState.chiller_2 ? "solid" : "outline"}
-                 className="flex items-center justify-center"
-                 onClick={() => {
-                   setChillerState({
-                     ...chillersState,
-                     chiller_2: !chillersState.chiller_2,
-                   });
-                 }}
-               >
-                 <svg
-                   xmlns="http://www.w3.org/2000/svg"
-                   width="16"
-                   height="16"
-                   fill="currentColor"
-                   viewBox="0 0 16 16"
-                 >
-                   <path d="M7.5 1v7h1V1z" />
-                   <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-                 </svg>
-                 <span className="ms-2">
-                   {chillersState.chiller_2 ? "Apagar" : "Encender"}
-                 </span>
-               </ButtonComponent>
-             </div>
-             <div className="bg-gray-50/25  w-full h-65 my-6 flex items-center justify-center ">
-               <img
-                 src={ChillerStandby}
-                 alt="UMA"
-                 className=" h-full object-contain"
-               />
-             </div>
-           </div>
-
-            <div>
-             
-
-             <div className="flex justify-between items-center">
-               <h2 className="text-xl my-4 text-center">Chiller 3</h2>
-
-               <ButtonComponent
-                 size="sm"
-                 style={chillersState.chiller_3 ? "solid" : "outline"}
-                 className="flex items-center justify-center"
-                 onClick={() => {
-                   setChillerState({
-                     ...chillersState,
-                     chiller_3: !chillersState.chiller_3,
-                   });
-                 }}
-               >
-                 <svg
-                   xmlns="http://www.w3.org/2000/svg"
-                   width="16"
-                   height="16"
-                   fill="currentColor"
-                   viewBox="0 0 16 16"
-                 >
-                   <path d="M7.5 1v7h1V1z" />
-                   <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-                 </svg>
-                 <span className="ms-2">
-                   {chillersState.chiller_3 ? "Apagar" : "Encender"}
-                 </span>
-               </ButtonComponent>
-             </div>
-             <div className="bg-gray-50/25  w-full h-65 my-6 flex items-center justify-center ">
-               <img
-                 src={ChillerStandby}
-                 alt="UMA"
-                 className=" h-full object-contain"
-               />
-             </div>
-           </div>
-            
-          
+              </div>
+            ))}
           </section>
 
           {/* 📉 Data section */}
