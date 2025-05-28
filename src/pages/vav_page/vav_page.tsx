@@ -6,6 +6,8 @@ import AvatarComponent from "../../components/avatar/avatar_component";
 import ButtonComponent from "../../components/button/button_component";
 import VavStandby from "../../assets/3d_models/vav/vav_status_standby.png";
 import VavWorking from "../../assets/3d_models/vav/vav_status_working.webm";
+import { useGetVavDevice } from "../../services/vav/vav_hooks";
+import LoadingComponent from "../../components/loading/loading_component";
 
 interface StatusModel {
   label: string;
@@ -21,27 +23,16 @@ interface VavModel {
 }
 
 const VavPage: React.FC = () => {
-  const [vavState, setVavState] = React.useState<VavModel>({
+  const [vavControllerState, setVavControllerState] = React.useState<VavModel>({
     mode: "automatic",
     temperature: 0,
     offset: 0,
     aperturePercentage: 0,
   });
 
-  const status: StatusModel[] = [
-    {
-      label: "Mode",
-      value: vavState.mode,
-      unity: "",
-    },
-    { label: "Temperatura", value: vavState.temperature, unity: "°C" },
-    { label: "Offset", value: vavState.offset, unity: "°C" },
-    {
-      label: "Porcentaje de apertura",
-      value: vavState.aperturePercentage,
-      unity: "%",
-    },
-  ];
+
+
+
 
   // SIDEBAR
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
@@ -51,6 +42,46 @@ const VavPage: React.FC = () => {
   const level = searchParams.get("level"); // Obtén el parámetro "level"
   const building = searchParams.get("building"); // Obtén el parámetro "building"
   const section = searchParams.get("section"); // Obtén el parámetro "building"
+
+    // Hook VAVS
+   const { device, loading, error } = useGetVavDevice(level ? parseInt(level) : 0, section ? parseInt(section) : 0);
+
+  if (loading || error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        {loading ? (
+          <LoadingComponent></LoadingComponent>
+        ) : (
+          <div className="text-center">
+            <h1 className="text-2xl mb-5">Ocurrió un error</h1>
+            <p className="text-sm text-gray-500">
+              No se pudo obtener los datos. Por favor, revise la conexion de los
+              dispositivos y NodeRed.
+            </p>
+            <ButtonComponent
+              className="mt-4"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Volver a intentar
+            </ButtonComponent>
+
+            <ButtonComponent
+              className="mt-4"
+              style="text"
+              size="sm"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Regresar al inicio
+            </ButtonComponent>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -111,19 +142,54 @@ const VavPage: React.FC = () => {
             <h2 className="text-lg my-4">Estatus</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 ">
-              {status.map((objeto, index) => (
+                
+                
+                {/* Mode */}
                 <div
-                  key={index}
                   className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
                 >
-                  <p className="text-sm">{objeto.label}</p>
+                  <p className="text-sm">Mode</p>
                   <p>
-                    <span className="text-xl ">{objeto.value}</span>
-                    <span className="text-sm"> {objeto.unity}</span>
+                    <span className="text-xl ">{device?.mode}</span>
                   </p>
                 </div>
-              ))}
+
+                {/* Temperature */}
+                <div
+                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                >
+                  <p className="text-sm">Mode</p>
+                  <p>
+                    <span className="text-xl ">{device?.mode}</span>
+                    <span className="text-sm ">°C</span>
+                  </p>
+                </div>
+
+                {/* Offset */}
+
+                <div
+                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                >
+                  <p className="text-sm">Offset</p>
+                  <p>
+                    <span className="text-xl ">{device?.offset}</span>
+                    <span className="text-sm ">°C</span>
+                  </p>
+                  </div>
+                {/* Porcentaje de apertura */}
+                <div
+                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                >
+                  <p className="text-sm">Apertura</p>
+                  <p>
+                    <span className="text-xl ">{device?.aperture}</span>
+                    <span className="text-sm ">%</span>
+                  </p>
+                </div>
+
             </div>
+
+
           </section>
         </ContainerComponent>
 

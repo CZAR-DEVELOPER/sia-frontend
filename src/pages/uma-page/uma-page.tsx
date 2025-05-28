@@ -5,36 +5,87 @@ import ButtonComponent from "../../components/button/button_component";
 import AvatarComponent from "../../components/avatar/avatar_component";
 import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
 import UmaWorking from "../../assets/3d_models/uma/uma_status_working.webm";
-
-interface StatusModel {
-  label: string;
-  value: number;
-  unity: string;
-}
+import { useGetSingleUma, useSetUmaFrequency, useSetUmaVah, useTurnOnUma } from "../../services/uma/uma_hooks";
+import { useSearchParams } from "react-router-dom";
 
 const UmaPage: React.FC = () => {
+  //GET URL PARAMS
+  const [searchParams] = useSearchParams();
+
+  const building = searchParams.get("building"); // "B"
+  const level = searchParams.get("level"); // "2"
+
   const [umaState, setUmaState] = React.useState({
-    isPowerOn: true,
-    frecuence: 0,
-    aperturePercentage: 0,
-    injectionTemperature: 0,
+    isPowerOn: false, // Estado de encendido/apagado
+    frecuence: 18,
+    aperture: 0,
   });
+
+  // HOOK UMA
+  const { uma, loading, error } = useGetSingleUma(
+    building ? building : "B",
+    level ? parseInt(level) : 0
+  );
+
+  // Batch update the state with the UMA data
+  const { setFrequency } = useSetUmaFrequency(level ? parseInt(level) : 0, umaState.frecuence);
+  const { setVah } = useSetUmaVah(level ? parseInt(level) : 0, umaState.aperture);
+
+  const handleBatch = async () => {
+    try {
+      await Promise.all([
+
+        setFrequency(),
+        setVah()
+      ]);
+      console.log('✅ Todos los comandos enviados con éxito');
+
+      // Reload the page to reflect the changes
+      window.location.reload();
+    } catch (error) {
+      console.error('❌ Error al ejecutar el batch:', error);
+    }
+  };
 
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true); // Estado para alternar la barra lateral
 
-  const status: StatusModel[] = [
-    {
-      label: "Temperatura de inyección",
-      value: umaState.injectionTemperature,
-      unity: "°C",
-    },
-    { label: "Frecuencia", value: umaState.frecuence, unity: "Hz" },
-    {
-      label: "Porcentaje de apertura",
-      value: umaState.aperturePercentage,
-      unity: "%",
-    },
-  ];
+  if (loading || error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        {loading ? (
+          <LoadingComponent></LoadingComponent>
+        ) : (
+          <div className="text-center">
+            <h1 className="text-2xl mb-5">Ocurrió un error</h1>
+            <p className="text-sm text-gray-500">
+              No se pudo obtener los datos. Por favor, revise la conexion de los
+              dispositivos y NodeRed.
+            </p>
+            <ButtonComponent
+              className="mt-4"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Volver a intentar
+            </ButtonComponent>
+
+            <ButtonComponent
+              className="mt-4"
+              style="text"
+              size="sm"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Regresar al inicio
+            </ButtonComponent>
+          </div>
+        )}
+      </div>
+    );
+  }
+  
 
   return (
     <div className="h-screen flex flex-col">
@@ -50,7 +101,7 @@ const UmaPage: React.FC = () => {
             </div>
             <div className="flex ">
               <ButtonComponent
-                disabled={!umaState.isPowerOn}
+                disabled={!uma.data}
                 size="sm"
                 style="outline"
                 className="flex items-center "
@@ -99,20 +150,20 @@ const UmaPage: React.FC = () => {
           </div>
 
           {/* ANIMATIONS SECTIONS */}
-            <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
+          <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
             {umaState.isPowerOn ? (
               <video
-              src={UmaWorking}
-              autoPlay
-              loop
-              muted
-              controls={false}
-              className="h-full object-fit"
+                src={UmaWorking}
+                autoPlay
+                loop
+                muted
+                controls={false}
+                className="h-full object-fit"
               ></video>
             ) : (
               <img src={UmaStandBy} alt="UMA" className="h-full object-fit" />
             )}
-            </div>
+          </div>
 
           {/* 📉 Data section */}
           <section
@@ -122,20 +173,20 @@ const UmaPage: React.FC = () => {
           >
             {/* STATUS SECTION */}
             <h2 className="text-lg my-4">Estatus</h2>
-
+              {uma.data.map((objeto, index) => (
+                            <div
+                              key={index}
+                              className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                            >
+                              <p className="text-sm">{objeto.name}</p>
+                              <p>
+                                <span className="text-xl ">{objeto.value}</span>
+                                <span className="text-sm"> </span>
+                              </p>
+                            </div>
+                          ))}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-              {status.map((objeto, index) => (
-                <div
-                  key={index}
-                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
-                >
-                  <p className="text-sm">{objeto.label}</p>
-                  <p>
-                    <span className="text-xl ">{objeto.value}</span>
-                    <span className="text-sm"> {objeto.unity}</span>
-                  </p>
-                </div>
-              ))}
+            
             </div>
           </section>
         </ContainerComponent>
@@ -145,9 +196,12 @@ const UmaPage: React.FC = () => {
         {/* CONTROLS SECTION */}
 
         <div
-          className={` ${isSidebarOpen== false || umaState.isPowerOn == false ? 'hidden':''}  bg-gray-100/80 p-8   backdrop-blur-md shadow-2xl rounded-2xl  sm:w-full md:w-125  h-full `}
+          className={` ${
+            isSidebarOpen == false || umaState.isPowerOn == false
+              ? "hidden"
+              : ""
+          }  bg-gray-100/80 p-8   backdrop-blur-md shadow-2xl rounded-2xl  sm:w-full md:w-125  h-full `}
         >
-         
           <h2 className=" text-3xl mb-16">Controles UMA</h2>
 
           {/* 🎛️ Control de Frecuencia */}
@@ -172,6 +226,8 @@ const UmaPage: React.FC = () => {
                   type="number"
                   className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
                   value={umaState.frecuence}
+                  max={55}
+                  min={18}
                   onChange={(e) => {
                     setUmaState((prevState) => ({
                       ...prevState,
@@ -185,10 +241,10 @@ const UmaPage: React.FC = () => {
             <div>
               <input
                 type="range"
-                min="0"
-                max="100"
                 className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
                 value={umaState.frecuence}
+                max={55}
+                min={18}
                 onChange={(e) => {
                   setUmaState((prevState) => ({
                     ...prevState,
@@ -220,7 +276,9 @@ const UmaPage: React.FC = () => {
                 <input
                   type="number"
                   className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
-                  value={umaState.aperturePercentage}
+                  value={umaState.aperture}
+                  max={100}
+                  min={0}
                   onChange={(e) => {
                     setUmaState((prevState) => ({
                       ...prevState,
@@ -237,7 +295,7 @@ const UmaPage: React.FC = () => {
                 min="0"
                 max="100"
                 className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
-                value={umaState.aperturePercentage}
+                value={umaState.aperture}
                 onChange={(e) => {
                   setUmaState((prevState) => ({
                     ...prevState,
@@ -250,13 +308,14 @@ const UmaPage: React.FC = () => {
 
           {/* 📧 Boton enviar */}
           <div className="mt-16">
-            <ButtonComponent className="flex justify-center items-center" onClick={() => {
-
-              //Hide the sidebar
-              setIsSidebarOpen(false);
-              //Send the data to the server
-              
-            }}>
+            <ButtonComponent
+              className="flex justify-center items-center"
+              onClick={() => {
+                //Hide the sidebar
+                setIsSidebarOpen(false);
+                //Send the data to the server
+              }}
+            >
               <span className="me-2">Actualizar estado</span>
 
               <svg

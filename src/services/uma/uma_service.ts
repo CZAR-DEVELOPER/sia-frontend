@@ -1,6 +1,24 @@
+//-------------------------📦 IMPORTS-------------------------
 import axios from "axios";
 
+//-------------------------🔗 ENVIRONMENT VARIABLES-------------------------
 const NODERED_API = import.meta.env.VITE_NODERED_API;
 
-export const getAllUmas = (building: string) => axios.get(`${NODERED_API}/get/umas/${building}`);
+//-------------------------🕹️ TYPES-------------------------
+export interface UmaData {
+  floor: number;
+  data: {
+    name: string;
+    value: number;
+    precision?: number;
+  }[];
+}
+
+export type UmaResponse = UmaData[];
+
+//-------------------------👾 FUNCTIONS-------------------------
+
+//All UMAS
+export const getAllUmas = (building: string) =>
+  axios.get(`${NODERED_API}/get/umas/${building}`);
 

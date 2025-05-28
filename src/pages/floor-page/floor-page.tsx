@@ -19,7 +19,7 @@ import NavbarComponent from "../../components/navbar/navbar-component";
 import FloorMapComponent from "../../components/floor-maps/floor-map-component";
 import FloorMapEditorComponent from "../../components/floor_map_editor/floor_map_editor_component";
 import FloorSidebarComponent from "../../components/floors_sidebar/floors_sidebar_component";
-import { useAllUmas } from "../../services/uma/uma_hooks";
+import { useAllUmas, useGetAllUmas } from "../../services/uma/uma_hooks";
 import LoadingComponent from "../../components/loading/loading_component";
 //import ButtonComponent from "../../components/button/button_component";
 
@@ -36,7 +36,7 @@ interface Point {
 const FloorPage: React.FC = () => {
   //Hooks
   const [isEditing, setIsEditing] = React.useState(false);
-  const { umas, loading } = useAllUmas('B'); 
+  const { umas, loading } = useGetAllUmas('B'); 
 
   
 
