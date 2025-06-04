@@ -39,7 +39,10 @@ export const useGetSingleUma = (building: string, floor: number) => {
     setError(null);
     getAllUmas(building)
       .then((res) => {
-        setUma(res.data.find((uma: UmaData) => uma.floor === floor) || {} as UmaData);
+
+        
+        console.log('UMA Data located:', res.data.data);
+        setUma(res.data.data[0]?? {} as UmaData);
       })
       .catch((err: unknown) => {
         setError(err);

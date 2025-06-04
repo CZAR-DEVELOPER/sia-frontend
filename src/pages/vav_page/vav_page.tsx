@@ -8,6 +8,7 @@ import VavStandby from "../../assets/3d_models/vav/vav_status_standby.png";
 import VavWorking from "../../assets/3d_models/vav/vav_status_working.webm";
 import { useGetVavDevice } from "../../services/vav/vav_hooks";
 import LoadingComponent from "../../components/loading/loading_component";
+import axios from "axios";
 
 interface StatusModel {
   label: string;
@@ -16,7 +17,7 @@ interface StatusModel {
 }
 
 interface VavModel {
-  mode: "manual" | "automatic";
+  mode: number;
   temperature: number;
   offset: number;
   aperturePercentage: number;
@@ -24,7 +25,7 @@ interface VavModel {
 
 const VavPage: React.FC = () => {
   const [vavControllerState, setVavControllerState] = React.useState<VavModel>({
-    mode: "automatic",
+    mode: 0,
     temperature: 0,
     offset: 0,
     aperturePercentage: 0,
@@ -44,9 +45,22 @@ const VavPage: React.FC = () => {
   const section = searchParams.get("section"); // Obtén el parámetro "building"
 
     // Hook VAVS
-   const { device, loading, error } = useGetVavDevice(level ? parseInt(level) : 0, section ? parseInt(section) : 0);
+  const { device, loading, error } = useGetVavDevice(level ? parseInt(level) : 0, section ? parseInt(section) : 0);
+
+  React.useEffect(() => {
+    if (!loading && device) {
+      setVavControllerState({
+        mode: device.mode ?? 0,
+        temperature: device.temp ?? 0,
+        offset: device.offset ?? 0,
+        aperturePercentage: device.aperture ?? 0,
+      });
+    }
+  }, [loading, device]);
 
   if (loading || error) {
+
+   
     return (
       <div className="h-screen flex items-center justify-center">
         {loading ? (
@@ -82,6 +96,7 @@ const VavPage: React.FC = () => {
       </div>
     );
   }
+
 
   return (
     <div className="h-screen flex flex-col">
@@ -150,7 +165,7 @@ const VavPage: React.FC = () => {
                 >
                   <p className="text-sm">Mode</p>
                   <p>
-                    <span className="text-xl ">{device?.mode}</span>
+                    <span className="text-xl ">{device?.mode == 0 ? "Automatico": "Manual"}</span>
                   </p>
                 </div>
 
@@ -158,9 +173,9 @@ const VavPage: React.FC = () => {
                 <div
                   className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
                 >
-                  <p className="text-sm">Mode</p>
+                  <p className="text-sm">Temperatura</p>
                   <p>
-                    <span className="text-xl ">{device?.mode}</span>
+                    <span className="text-xl ">{device?.temp?? "Sin conexion"}</span>
                     <span className="text-sm ">°C</span>
                   </p>
                 </div>
@@ -172,7 +187,7 @@ const VavPage: React.FC = () => {
                 >
                   <p className="text-sm">Offset</p>
                   <p>
-                    <span className="text-xl ">{device?.offset}</span>
+                    <span className="text-xl ">{device?.offset ?? 'Sin conexion'}</span>
                     <span className="text-sm ">°C</span>
                   </p>
                   </div>
@@ -182,7 +197,7 @@ const VavPage: React.FC = () => {
                 >
                   <p className="text-sm">Apertura</p>
                   <p>
-                    <span className="text-xl ">{device?.aperture}</span>
+                    <span className="text-xl ">{device?.aperture?? "Sin conexion"}</span>
                     <span className="text-sm ">%</span>
                   </p>
                 </div>
@@ -219,9 +234,18 @@ const VavPage: React.FC = () => {
               
             </div>
             <div>
-              <select className="w-full bg-gray-200 rounded p-2 border-none outline-none p-0 m-0 text-center">
-                <option value="automatic">Automatico</option>
-                <option value="manual">Manual</option>
+              <select
+                className="w-full bg-gray-200 rounded p-2 border-none outline-none p-0 m-0 text-center"
+                value={vavControllerState.mode}
+                onChange={(e) => {
+                  setVavControllerState((prevState) => ({
+                    ...prevState,
+                    mode: parseInt(e.target.value),
+                  }));
+                }}
+              >
+                <option value={0}>Automatico</option>
+                <option value={1}>Manual</option>
               </select>
             </div>
           </div>
@@ -249,6 +273,17 @@ const VavPage: React.FC = () => {
                 <input
                   type="number"
                   className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
+                  value={vavControllerState.temperature ?? 0}
+                  onChange={(e) => {
+                    // Update temperature value
+                    const newValue = parseInt(e.target.value);
+                    setVavControllerState((prevState) => ({
+                      ...prevState,
+                      temperature: isNaN(newValue) ? 0 : newValue,
+                    }));
+                  }}
+                  max={23}
+                  min={19}
                 />
                 °C
               </p>
@@ -256,9 +291,19 @@ const VavPage: React.FC = () => {
             <div>
               <input
                 type="range"
-                min="0"
-                max="100"
+                min="19"
+                max="23"
                 className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
+                value={vavControllerState.temperature ?? 0}
+                onChange={(e) => {
+                  // Update temperature value
+                  const newValue = parseInt(e.target.value);
+                  setVavControllerState((prevState) => ({
+                    ...prevState,
+                    temperature: isNaN(newValue) ? 0 : newValue,
+                  }));
+                }}
+                
               />
             </div>
           </div>
@@ -287,6 +332,15 @@ const VavPage: React.FC = () => {
                 <input
                   type="number"
                   className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
+                  value={vavControllerState.offset ?? 0}
+                  onChange={(e) => {
+                    // Update offset value
+                    const newValue = parseInt(e.target.value);
+                    setVavControllerState((prevState) => ({
+                      ...prevState,
+                      offset: isNaN(newValue) ? 0 : newValue,
+                    }));
+                  }}
                 />
                 °C
               </p>
@@ -296,6 +350,13 @@ const VavPage: React.FC = () => {
                 size="sm"
                 style="icon"
                 className="flex items-center "
+                onClick={() => {
+                  // Decrease offset
+                  setVavControllerState((prev) => ({
+                    ...prev,
+                    offset: prev.offset - 1,
+                  }));
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -310,11 +371,18 @@ const VavPage: React.FC = () => {
                   />
                 </svg>
               </ButtonComponent>
-              <p className="text-xl text-center">0</p>
+              <p className="text-xl text-center">{vavControllerState.offset ?? 'Sin conexion'}</p>
               <ButtonComponent
                 size="sm"
                 style="icon"
                 className="flex items-center "
+                onClick={() => {
+                  // Incrementar el offset en 1
+                  setVavControllerState((prevState) => ({
+                    ...prevState,
+                    offset: (prevState.offset ?? 0) + 1,
+                  }));
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -337,15 +405,26 @@ const VavPage: React.FC = () => {
             <ButtonComponent
               className="flex justify-center items-center"
               onClick={() => {
-                //Hide the sidebar
-                setIsSidebarOpen(false);
-                //Send the data to the server
-                setVavState({
-                  mode: "automatic",
-                  temperature: 0,
-                  offset: 0,
-                  aperturePercentage: 0,
-                });
+                
+                // Aquí puedes agregar la lógica para enviar los datos al backend
+                console.log("Enviando datos:", vavControllerState);
+
+                axios.post("http://10.1.38.171:1880/post/vav/act_stat", {
+                  floor: level ?? "1",
+                  device: section ?? "0",
+                  Ap: 1,
+                  C: 0,
+                  Modo: vavControllerState.mode,
+                  SP: vavControllerState.temperature, // 450 in your example, adjust as needed
+                  offset: vavControllerState.offset,
+                })
+                  .then(() => {
+                  alert("Datos enviados correctamente");
+                  window.location.reload(); // Recargar la página para ver los cambios
+                  })
+                  .catch((error) => {
+                  alert("Error al enviar los datos: " + error.message);
+                  });
               }}
             >
               <span className="me-2">Actualizar estado</span>

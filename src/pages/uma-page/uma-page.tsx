@@ -7,6 +7,7 @@ import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
 import UmaWorking from "../../assets/3d_models/uma/uma_status_working.webm";
 import { useGetSingleUma, useSetUmaFrequency, useSetUmaVah, useTurnOnUma } from "../../services/uma/uma_hooks";
 import { useSearchParams } from "react-router-dom";
+import LoadingComponent from "../../components/loading/loading_component";
 
 const UmaPage: React.FC = () => {
   //GET URL PARAMS
@@ -31,25 +32,12 @@ const UmaPage: React.FC = () => {
   const { setFrequency } = useSetUmaFrequency(level ? parseInt(level) : 0, umaState.frecuence);
   const { setVah } = useSetUmaVah(level ? parseInt(level) : 0, umaState.aperture);
 
-  const handleBatch = async () => {
-    try {
-      await Promise.all([
-
-        setFrequency(),
-        setVah()
-      ]);
-      console.log('✅ Todos los comandos enviados con éxito');
-
-      // Reload the page to reflect the changes
-      window.location.reload();
-    } catch (error) {
-      console.error('❌ Error al ejecutar el batch:', error);
-    }
-  };
+  
 
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true); // Estado para alternar la barra lateral
 
-  if (loading || error) {
+  if (loading || error ) {
+    console.log("Loading or error state detected:", { loading, error });
     return (
       <div className="h-screen flex items-center justify-center">
         {loading ? (
