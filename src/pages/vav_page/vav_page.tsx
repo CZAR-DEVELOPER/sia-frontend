@@ -171,11 +171,19 @@ const VavPage: React.FC = () => {
 
                 {/* Temperature */}
                 <div
-                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                    className={`text-sm p-8 rounded-2xl text-white ${
+    !device?.temp && device?.temp !== 0   // valor nulo o indefinido
+      ? "bg-gray-950 text-gray-600"
+      : device.temp < 20
+      ? "bg-blue-600"                     // azul para < 20 °C
+      : device.temp < 22
+      ? "bg-green-600"                    // verde para 20–21.9 °C
+      : "bg-red-600"                      // rojo para ? 22 °C
+  }`}
                 >
                   <p className="text-sm">Temperatura</p>
                   <p>
-                    <span className="text-xl ">{device?.temp?? "Sin conexion"}</span>
+                    <span className="text-xl ">{device?.temp ?? "Sin conexion"}</span>
                     <span className="text-sm ">°C</span>
                   </p>
                 </div>

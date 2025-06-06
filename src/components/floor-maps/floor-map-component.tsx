@@ -52,7 +52,7 @@ const FloorMapComponent: React.FC<FloorMapComponentProps> = ({ pointsList, image
           left: `${point.x}%`,
           transform: "translate(-50%, -50%)",
           backgroundColor: point.color ,
-          opacity: 0.75,
+          opacity: 0.90,
         }}
        
         >
