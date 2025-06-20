@@ -2,6 +2,10 @@ import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
 import ContainerComponent from "../../components/container/container_component";
 import ChillerStandby from "../../assets/3d_models/chiller/chiller_standby.png";
+import { useChillerTemps } from "../../services/chillers/chillers_hooks";
+import LoadingComponent from "../../components/loading/loading_component";
+import ButtonComponent from "../../components/button/button_component";
+
 
 interface StatusModel {
   label: string;
@@ -9,7 +13,15 @@ interface StatusModel {
   unity: string;
 }
 
+
+
+
 const ChillersPage: React.FC = () => {
+
+  
+// HOOK chillers
+  const { chillersData, loading, error } = useChillerTemps();
+
   const [chillersState, setChillerState] = React.useState({
     chiller_1: true,
     chiller_2: true,
@@ -54,6 +66,44 @@ const ChillersPage: React.FC = () => {
       unity: "°C",
     },
   ];
+
+  if (loading || error ) {
+    console.log("Loading or error state detected:", { loading, error });
+    return (
+      <div className="h-screen flex items-center justify-center">
+        {loading ? (
+          <LoadingComponent></LoadingComponent>
+        ) : (
+          <div className="text-center">
+            <h1 className="text-2xl mb-5">Ocurrió un error</h1>
+            <p className="text-sm text-gray-500">
+              No se pudo obtener los datos. Por favor, revise la conexion de los
+              dispositivos y NodeRed.
+            </p>
+            <ButtonComponent
+              className="mt-4"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Volver a intentar
+            </ButtonComponent>
+
+            <ButtonComponent
+              className="mt-4"
+              style="text"
+              size="sm"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Regresar al inicio
+            </ButtonComponent>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -102,18 +152,49 @@ const ChillersPage: React.FC = () => {
             <h2 className="text-lg my-4">Estatus</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-              {status.map((objeto, index) => (
-                <div
-                  key={index}
+              <div
                   className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
                 >
-                  <p className="text-sm">{objeto.label}</p>
+                  <p className="text-sm">Temp. de inyección de agua helada</p>
                   <p>
-                    <span className="text-xl ">{objeto.value}</span>
-                    <span className="text-sm"> {objeto.unity}</span>
+                    <span className="text-xl ">
+                      {chillersData.data && chillersData.data.supplyTemp !== undefined
+                        ? chillersData.data.supplyTemp
+                        : "Sin conexion"}
+                    </span>
+                    <span className="text-sm">°C</span>
                   </p>
                 </div>
-              ))}
+
+
+                <div
+                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                >
+                  <p className="text-sm">Temp. de retorno de agua helada</p>
+                  <p>
+                    <span className="text-xl ">
+                      {chillersData.data && chillersData.data.returnTemp !== undefined
+                        ? chillersData.data.returnTemp
+                        : "Sin conexion"}
+                    </span>
+                    <span className="text-sm">°C</span>
+                  </p>
+                </div>
+
+                
+                <div
+                  className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
+                >
+                  <p className="text-sm">Temp. de retorno de condensados</p>
+                  <p>
+                    <span className="text-xl ">
+                      {chillersData.data && chillersData.data.condensedTemp !== undefined
+                        ? chillersData.data.condensedTemp
+                        : "Sin conexion"}
+                    </span>
+                    <span className="text-sm">°C</span>
+                  </p>
+                </div>
             </div>
           </section>
         </ContainerComponent>

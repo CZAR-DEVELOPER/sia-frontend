@@ -44,7 +44,7 @@ const NavbarComponent: React.FC<NavbarProps> = ({
 
       <div className="text-center text-2xl">{title}</div>
 
-      <div className="flex flex-row-reverse">
+      <div className="flex flex-row-reverse hidden">
         <ButtonComponent size="sm" style="solid">
           Cerrar sesión
         </ButtonComponent>

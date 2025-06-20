@@ -160,21 +160,21 @@ const UmaPage: React.FC = () => {
             }`}
           >
             {/* STATUS SECTION */}
-            <h2 className="text-lg my-4">Estatus</h2>
-              {uma.data.map((objeto, index) => (
-                            <div
-                              key={index}
-                              className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
-                            >
-                              <p className="text-sm">{objeto.name}</p>
-                              <p>
-                                <span className="text-xl ">{objeto.value}</span>
-                                <span className="text-sm"> </span>
-                              </p>
-                            </div>
-                          ))}
+            <h2 className="text-lg my-4 ">Estatus</h2>
+             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-            
+             {uma.data &&
+                Object.entries(uma.data).map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="text-sm opacity-75 p-8 bg-gray-100 rounded-2xl mb-2"
+                  >
+                    <p className="text-sm font-semibold">{key}</p>
+                    <p>
+                      <span className="text-xl">{String(value)}</span>
+                    </p>
+                  </div>
+                ))}
             </div>
           </section>
         </ContainerComponent>
