@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
         {name: "Piso 2", id: "2", isFloor: true, customUrl: ''},
         {name: "Piso 3", id: "3", isFloor: true, customUrl: ''},
         {name: "Piso 4", id: "4", isFloor: true, customUrl: ''},
-        {name: "Bombeo terciario", id: "Bombeo", isFloor: false, customUrl: ''},
+        {name: "Bombeo terciario", id: "Bombeo", isFloor: false, customUrl: '/pumps/3'},
       ],
       shape: "poly",
       fillColor: "#ffffff40",
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
       id: "F",
       label:"Edificio F",
       floors: [
-        {name: "Bombeo primario y secundario", id: "Bombeo", isFloor: false, customUrl: ''},
+        {name: "Bombeo primario y secundario", id: "Bombeo", isFloor: false, customUrl: '/pumps/1,2'},
         {name: "Chillers", id: "Chillers", isFloor: false,  customUrl: 'chillers'},
         {name: "Torres de enfriamiento", id: "Torres de enfriamiento",  isFloor: false,  customUrl: 'cooling-towers'},
       ],

@@ -1,6 +1,7 @@
 import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
 import ContainerComponent from "../../components/container/container_component";
+import CoolingTowerModel from "../../assets/3d_models/cooling_towers/cooling_towers.webm";
 
 const CoolingTowersPage: React.FC = () => {
   const [coolingTowersState, setCoolingTowersState] = React.useState([
@@ -33,7 +34,19 @@ const CoolingTowersPage: React.FC = () => {
           </div>
 
           {/* ANIMATIONS SECTIONS */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4"></section>
+      {/* ANIMATIONS SECTIONS */}
+            <div className="bg-gray-50/25  w-full h-100 my-2 flex items-center justify-center ">
+            {/* <img src={VavStandby} alt="UMA" className=" h-full object-fit" /> */}
+            
+            <video
+              src={CoolingTowerModel}
+              autoPlay
+              loop
+              muted
+              controls={false}
+              className="h-full object-fit"
+              ></video>
+            </div>
 
           {/* 📉 Data section */}
           <section>
