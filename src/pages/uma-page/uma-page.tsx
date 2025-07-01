@@ -5,7 +5,12 @@ import ButtonComponent from "../../components/button/button_component";
 import AvatarComponent from "../../components/avatar/avatar_component";
 import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
 import UmaWorking from "../../assets/3d_models/uma/uma_status_working.webm";
-import { useGetSingleUma, useSetUmaFrequency, useSetUmaVah, useTurnOnUma } from "../../services/uma/uma_hooks";
+import {
+  useGetSingleUma,
+  useSetUmaFrequency,
+  useSetUmaVah,
+  useTurnOnUma,
+} from "../../services/uma/uma_hooks";
 import { useSearchParams } from "react-router-dom";
 import LoadingComponent from "../../components/loading/loading_component";
 
@@ -17,7 +22,7 @@ const UmaPage: React.FC = () => {
   const level = searchParams.get("level"); // "2"
 
   const [umaState, setUmaState] = React.useState({
-    isPowerOn: false, // Estado de encendido/apagado
+    isPowerOn: "Arranque", // Estado de encendido/apagado
     frecuence: 18,
     aperture: 0,
   });
@@ -29,14 +34,24 @@ const UmaPage: React.FC = () => {
   );
 
   // Batch update the state with the UMA data
-  const { setFrequency } = useSetUmaFrequency(level ? parseInt(level) : 0, umaState.frecuence);
-  const { setVah } = useSetUmaVah(level ? parseInt(level) : 0, umaState.aperture);
-
-  
+  const { turnOnUma, loading, success } = useTurnOnUma(
+    level ? parseInt(level) : 0
+  );
+  const { setFrequency } = useSetUmaFrequency(
+    level ? parseInt(level) : 0,
+    umaState.frecuence
+  );
+  const { setVah } = useSetUmaVah(
+    level ? parseInt(level) : 0,
+    umaState.aperture
+  );
 
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true); // Estado para alternar la barra lateral
 
-  if (loading || error ) {
+  // Fill current state with data
+  
+
+  if (loading || error) {
     console.log("Loading or error state detected:", { loading, error });
     return (
       <div className="h-screen flex items-center justify-center">
@@ -73,7 +88,6 @@ const UmaPage: React.FC = () => {
       </div>
     );
   }
-  
 
   return (
     <div className="h-screen flex flex-col">
@@ -85,7 +99,9 @@ const UmaPage: React.FC = () => {
         <ContainerComponent>
           <div className="flex justify-between mb-4">
             <div>
-              <h1 className="text-2xl ">UMA - Edificio {building}, Piso {level} </h1>
+              <h1 className="text-2xl ">
+                UMA - Edificio {building}, Piso {level}{" "}
+              </h1>
             </div>
             <div className="flex ">
               <ButtonComponent
@@ -136,7 +152,7 @@ const UmaPage: React.FC = () => {
 
           {/* ANIMATIONS SECTIONS */}
           <div className="bg-gray-50/25 py-2 w-full h-90 my-6 flex items-center justify-center ">
-            {umaState.isPowerOn ? (
+            {uma.data.Estado == "Arranque" ? (
               <video
                 src={UmaWorking}
                 autoPlay
@@ -153,14 +169,16 @@ const UmaPage: React.FC = () => {
           {/* 📉 Data section */}
           <section
             className={`${
-              uma.data.Estado !== "Arranque"  ? "pointer-events-none opacity-50" : ""
+              uma.data.Estado !== "Arranque"
+                ? "pointer-events-none opacity-50"
+                : ""
             }`}
           >
             {/* STATUS SECTION */}
             <h2 className="text-lg my-4 ">Estatus</h2>
-             
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-             {uma.data &&
+              {uma.data &&
                 Object.entries(uma.data).map(([key, value]) => (
                   <div
                     key={key}
@@ -188,6 +206,40 @@ const UmaPage: React.FC = () => {
           }  bg-gray-100/80 p-8   backdrop-blur-md shadow-2xl rounded-2xl  sm:w-full md:w-125  h-full `}
         >
           <h2 className=" text-3xl mb-16">Controles UMA</h2>
+
+          {/* 🎛️ Control de prendido o apagado */}
+          <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
+            <div>
+              <AvatarComponent variant="white" size="large">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M7.5 1v7h1V1z" />
+                  <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
+                </svg>
+              </AvatarComponent>
+            </div>
+
+            <div>
+              <select
+                className="bg-transparent border border-gray-300 rounded-md px-2 py-1"
+                value={umaState.isPowerOn ? "Arranque" : "Apagado"}
+                onChange={(e) => {
+                  setUmaState((prevState) => ({
+                    ...prevState,
+                    isPowerOn: e.target.value === "Arranque",
+                  }));
+                }}
+              >
+                <option value="Arranque">Arranque</option>
+                <option value="Apagado">Apagado</option>
+              </select>
+            </div>
+          </div>
 
           {/* 🎛️ Control de Frecuencia */}
           <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
@@ -299,6 +351,8 @@ const UmaPage: React.FC = () => {
                 //Hide the sidebar
                 setIsSidebarOpen(false);
                 //Send the data to the server
+
+
               }}
             >
               <span className="me-2">Actualizar estado</span>
