@@ -85,7 +85,7 @@ const UmaPage: React.FC = () => {
         <ContainerComponent>
           <div className="flex justify-between mb-4">
             <div>
-              <h1 className="text-2xl ">UMA de Cocina</h1>
+              <h1 className="text-2xl ">UMA - Edificio {building}, Piso {level} </h1>
             </div>
             <div className="flex ">
               <ButtonComponent
@@ -110,14 +110,11 @@ const UmaPage: React.FC = () => {
                 <span className="ms-2">Ver controles</span>
               </ButtonComponent>
               <ButtonComponent
-                style={umaState.isPowerOn ? "solid" : "outline"}
+                style={uma.data.Estado == "Arranque" ? "solid" : "outline"}
                 className="flex items-center ms-2 bg-blue-500"
                 size="sm"
                 onClick={() => {
-                  setUmaState((prevState) => ({
-                    ...prevState,
-                    isPowerOn: !prevState.isPowerOn,
-                  }));
+                  alert("Encendiendo UMA...");
                 }}
               >
                 <svg
@@ -131,7 +128,7 @@ const UmaPage: React.FC = () => {
                   <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
                 </svg>
                 <span className="ms-2">
-                  {umaState.isPowerOn ? "Encendido" : "Apagado"}
+                  {uma.data.Estado == "Arranque" ? "Encendido" : "Apagado"}
                 </span>
               </ButtonComponent>
             </div>
@@ -156,7 +153,7 @@ const UmaPage: React.FC = () => {
           {/* 📉 Data section */}
           <section
             className={`${
-              !umaState.isPowerOn ? "pointer-events-none opacity-50" : ""
+              uma.data.Estado !== "Arranque"  ? "pointer-events-none opacity-50" : ""
             }`}
           >
             {/* STATUS SECTION */}
@@ -185,7 +182,7 @@ const UmaPage: React.FC = () => {
 
         <div
           className={` ${
-            isSidebarOpen == false || umaState.isPowerOn == false
+            isSidebarOpen == false || uma.data.Estado !== "Arranque"
               ? "hidden"
               : ""
           }  bg-gray-100/80 p-8   backdrop-blur-md shadow-2xl rounded-2xl  sm:w-full md:w-125  h-full `}

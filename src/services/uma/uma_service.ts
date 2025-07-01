@@ -7,11 +7,7 @@ const NODERED_API = import.meta.env.VITE_NODERED_API;
 //-------------------------🕹️ TYPES-------------------------
 export interface UmaData {
   floor: number;
-  data: {
-    name: string;
-    value: number;
-    precision?: number;
-  }[];
+  data: any;
 }
 
 export type UmaResponse = UmaData[];
