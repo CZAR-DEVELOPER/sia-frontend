@@ -41,8 +41,12 @@ export const useGetSingleUma = (building: string, floor: number) => {
       .then((res) => {
 
         
-        console.log('UMA Data located:', res.data.data);
-        setUma(res.data.data[0]?? {} as UmaData);
+          const match = res.data.data.find((u:any) => u.floor === floor);
+        // Find the UMA for the specified floor
+        console.log("UMA DATA", match);
+
+    setUma(match ?? ({} as UmaData));
+
       })
       .catch((err: unknown) => {
         setError(err);
@@ -58,11 +62,11 @@ export const useGetSingleUma = (building: string, floor: number) => {
 // Component to turn on UMA
 
 export const useTurnOnUma = (floor: number) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingUseTurnOnUma, setLoadingUseTurnOnUma] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
 
   const turnOnUma = async (value: number = 151) => {
-    setLoading(true);
+    setLoadingUseTurnOnUma(true);
     setSuccess(null);
 
     try {
@@ -80,20 +84,19 @@ export const useTurnOnUma = (floor: number) => {
       console.error('Error al encender la UMA:', error);
       setSuccess(false);
     } finally {
-      setLoading(false);
+      setLoadingUseTurnOnUma(false);
     }
   };
 
-  return { turnOnUma, loading, success };
+  return { turnOnUma, loadingUseTurnOnUma, success };
 };
-
 // Component to turn off UMA
 export const useTurnOffUma = (floor: number) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingUseTurnOffUma, setLoadingUseTurnOffUma] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
 
   const turnOffUma = async (value: number = 150) => {
-    setLoading(true);
+    setLoadingUseTurnOffUma(true);
     setSuccess(null);
 
     try {
@@ -111,11 +114,11 @@ export const useTurnOffUma = (floor: number) => {
       console.error('Error al encender la UMA:', error);
       setSuccess(false);
     } finally {
-      setLoading(false);
+      setLoadingUseTurnOffUma(false);
     }
   };
 
-  return { turnOffUma, loading, success };
+  return { turnOffUma, loadingUseTurnOffUma, success };
 };
 
 // Component to set UMA frequency

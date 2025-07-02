@@ -13,6 +13,7 @@ import {
 } from "../../services/uma/uma_hooks";
 import { useSearchParams } from "react-router-dom";
 import LoadingComponent from "../../components/loading/loading_component";
+import { useTurnOffUma } from "../../services/uma/uma_hooks";
 
 const UmaPage: React.FC = () => {
   //GET URL PARAMS
@@ -34,9 +35,14 @@ const UmaPage: React.FC = () => {
   );
 
   // Batch update the state with the UMA data
-  const { turnOnUma, loading, success } = useTurnOnUma(
+  const { turnOnUma, loadingUseTurnOnUma, success } = useTurnOnUma(
     level ? parseInt(level) : 0
   );
+
+  const { turnOffUma, loadingUseTurnOffUma, success: successTurnOff } = useTurnOffUma(
+    level ? parseInt(level) : 0
+  );
+
   const { setFrequency } = useSetUmaFrequency(
     level ? parseInt(level) : 0,
     umaState.frecuence
@@ -49,6 +55,29 @@ const UmaPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true); // Estado para alternar la barra lateral
 
   // Fill current state with data
+  React.useEffect(() => {
+    if (uma.data) {
+      setUmaState({
+        isPowerOn: uma.data.Estado,
+        frecuence: uma.data.Frecuencia,
+        aperture: uma.data["Temperatura de inyección"],
+      });
+    }
+  }, [uma.data]);
+
+  const handleUpdateUma = async () => {
+    if (umaState.isPowerOn !== "Arranque") {
+      // Turn off UMA if not "Arranque"
+      await turnOffUma();
+    } else {
+      // Update frequency and aperture, then turn on UMA
+      await setFrequency();
+      await setVah();
+      await turnOnUma();
+    }
+    // Show alert to user
+    alert("Los cambios tomarán un poco de tiempo en procesarse, recargue la página para verificar el estado en unos minutos");
+  };
   
 
   if (loading || error) {
@@ -125,28 +154,7 @@ const UmaPage: React.FC = () => {
                 </svg>
                 <span className="ms-2">Ver controles</span>
               </ButtonComponent>
-              <ButtonComponent
-                style={uma.data.Estado == "Arranque" ? "solid" : "outline"}
-                className="flex items-center ms-2 bg-blue-500"
-                size="sm"
-                onClick={() => {
-                  alert("Encendiendo UMA...");
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M7.5 1v7h1V1z" />
-                  <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-                </svg>
-                <span className="ms-2">
-                  {uma.data.Estado == "Arranque" ? "Encendido" : "Apagado"}
-                </span>
-              </ButtonComponent>
+              
             </div>
           </div>
 
@@ -200,162 +208,177 @@ const UmaPage: React.FC = () => {
 
         <div
           className={` ${
-            isSidebarOpen == false || uma.data.Estado !== "Arranque"
+            isSidebarOpen == false 
               ? "hidden"
               : ""
           }  bg-gray-100/80 p-8   backdrop-blur-md shadow-2xl rounded-2xl  sm:w-full md:w-125  h-full `}
         >
           <h2 className=" text-3xl mb-16">Controles UMA</h2>
-
+ 
           {/* 🎛️ Control de prendido o apagado */}
           <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
             <div>
               <AvatarComponent variant="white" size="large">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M7.5 1v7h1V1z" />
-                  <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+</svg>
               </AvatarComponent>
             </div>
-
             <div>
-              <select
-                className="bg-transparent border border-gray-300 rounded-md px-2 py-1"
-                value={umaState.isPowerOn ? "Arranque" : "Apagado"}
-                onChange={(e) => {
-                  setUmaState((prevState) => ({
-                    ...prevState,
-                    isPowerOn: e.target.value === "Arranque",
-                  }));
-                }}
-              >
-                <option value="Arranque">Arranque</option>
-                <option value="Apagado">Apagado</option>
-              </select>
+              <h3 className="small">Estado</h3>
+              
+            </div>
+            <div>
+              <div className={umaState.isPowerOn === "Error" ? "opacity-50" : ""}>
+                <select
+                  disabled={umaState.isPowerOn === "Error"}
+                  className="w-full bg-gray-200 rounded p-2 border-none outline-none p-0 m-0 text-center"
+                  value={umaState.isPowerOn}
+                  onChange={(e) => {
+                    setUmaState((prevState) => ({
+                      ...prevState,
+                      isPowerOn: e.target.value,
+                    }));
+                  }}
+                >
+                  <option value={"error"} disabled>Error</option>
+                  <option value={"Paro"}>Paro</option>
+                  <option value={"Arranque"}>Encendido</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* 🎛️ Control de Frecuencia */}
-          <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
+          {/* Form to change the UMA state */}
+            <section className={`${umaState.isPowerOn !== "Arranque" ? "pointer-events-none opacity-25" : "opacity-100"}`}>
+            
+            {/* 🎛️ Control de Frecuencia */}
+            <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
             <div>
               <AvatarComponent variant="white" size="large">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
-                </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
+              </svg>
               </AvatarComponent>
             </div>
             <div>
               <h3 className="small">Frecuencia</h3>
               <p className="text-sm opacity-50">
-                <input
-                  type="number"
-                  className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
-                  value={umaState.frecuence}
-                  max={55}
-                  min={18}
-                  onChange={(e) => {
-                    setUmaState((prevState) => ({
-                      ...prevState,
-                      frecuence: parseInt(e.target.value),
-                    }));
-                  }}
-                />
-                Hz
-              </p>
-            </div>
-            <div>
               <input
-                type="range"
-                className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
+                type="number"
+                className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
                 value={umaState.frecuence}
                 max={55}
                 min={18}
+                disabled={umaState.isPowerOn !== "Arranque"}
                 onChange={(e) => {
-                  setUmaState((prevState) => ({
-                    ...prevState,
-                    frecuence: parseInt(e.target.value),
-                  }));
+                setUmaState((prevState) => ({
+                  ...prevState,
+                  frecuence: parseInt(e.target.value),
+                }));
                 }}
               />
-            </div>
-          </div>
-
-          {/* 🎛️  Control de apertura */}
-          <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full ">
-            <div>
-              <AvatarComponent variant="white" size="large">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M13.442 2.558a.625.625 0 0 1 0 .884l-10 10a.625.625 0 1 1-.884-.884l10-10a.625.625 0 0 1 .884 0M4.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5m7 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
-                </svg>
-              </AvatarComponent>
-            </div>
-            <div>
-              <h3 className="text">Procentaje de apertura</h3>
-              <p className="text-sm opacity-50">
-                <input
-                  type="number"
-                  className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
-                  value={umaState.aperture}
-                  max={100}
-                  min={0}
-                  onChange={(e) => {
-                    setUmaState((prevState) => ({
-                      ...prevState,
-                      aperturePercentage: parseInt(e.target.value),
-                    }));
-                  }}
-                />
-                %
+              Hz
               </p>
             </div>
             <div>
               <input
-                type="range"
-                min="0"
-                max="100"
-                className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
-                value={umaState.aperture}
-                onChange={(e) => {
-                  setUmaState((prevState) => ({
-                    ...prevState,
-                    aperturePercentage: parseInt(e.target.value),
-                  }));
-                }}
+              type="range"
+              className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
+              value={umaState.frecuence}
+              max={55}
+              min={18}
+              disabled={umaState.isPowerOn !== "Arranque"}
+              onChange={(e) => {
+                setUmaState((prevState) => ({
+                ...prevState,
+                frecuence: parseInt(e.target.value),
+                }));
+              }}
               />
             </div>
-          </div>
+            </div>
+
+            {/* 🎛️  Control de apertura */}
+            <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full ">
+            <div>
+              <AvatarComponent variant="white" size="large">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"  viewBox="0 0 16 16">
+  <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415"/>
+  <path d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1"/>
+</svg>
+              </AvatarComponent>
+            </div>
+            <div>
+              <h3 className="text">Temperatura de inyección</h3>
+              <p className="text-sm opacity-50">
+              <input
+                type="number"
+                className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
+                value={umaState.aperture}
+                max={100}
+                min={0}
+                disabled={umaState.isPowerOn !== "Arranque"}
+                onChange={(e) => {
+                setUmaState((prevState) => ({
+                  ...prevState,
+                  aperture: parseInt(e.target.value),
+                }));
+                }}
+              />
+              %
+              </p>
+            </div>
+            <div>
+              <input
+              type="range"
+              min="0"
+              max="100"
+              className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
+              value={umaState.aperture}
+              disabled={umaState.isPowerOn !== "Arranque"}
+              onChange={(e) => {
+                setUmaState((prevState) => ({
+                ...prevState,
+                aperture: parseInt(e.target.value),
+                }));
+              }}
+              />
+            </div>
+            </div>
+
+            </section>
+
+            {umaState.isPowerOn}
+
 
           {/* 📧 Boton enviar */}
           <div className="mt-16">
             <ButtonComponent
+            disabled={umaState.isPowerOn === "Error"}
               className="flex justify-center items-center"
               onClick={() => {
                 //Hide the sidebar
-                setIsSidebarOpen(false);
+                handleUpdateUma();
                 //Send the data to the server
 
 
               }}
             >
-              <span className="me-2">Actualizar estado</span>
+                {umaState.isPowerOn === "Error" ? (
+                <span className="me-2">Error en el estado, revise la conexion</span>
+                ) : umaState.isPowerOn !== "Arranque" ? (
+                <span className="me-2">Apagar UMA</span>
+                ) : (
+                <span className="me-2">Actualizar estado</span>
+                )}
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -370,6 +393,21 @@ const UmaPage: React.FC = () => {
                 />
               </svg>
             </ButtonComponent>
+            
+            
+            <ButtonComponent
+              className="mt-4 w-full opacity-75"
+              style="icon"
+              size="sm"
+              onClick={() => window.location.reload()}
+            >
+              Recargar página
+            </ButtonComponent>
+
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              El status de la UMA se actualizará en unos minutos despues de enviada la solicitud. Si no ves cambios espera unos minutos y recarga la página
+            </p>
+
           </div>
         </div>
       </div>
