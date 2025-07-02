@@ -31,7 +31,7 @@ export const getBombeo3 = () =>
 //Get bombeos 1,2
 
 export const getBombeo1 = () =>
-  axios.get(`${NODERED_API}/get/bombeo3`, {
+  axios.get(`${NODERED_API}/get/bombeo1`, {
     params: {
       Cuarto: "Sec",
       Edificio: "1",
