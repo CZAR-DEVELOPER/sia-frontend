@@ -24,7 +24,7 @@ const FloorSidebarComponent: React.FC<FloorSidebarProps> = ({
         { name: "Piso 2", id: "2", isFloor: true, customUrl: '' },
         { name: "Piso 3", id: "3", isFloor: true, customUrl: '' },
         { name: "Piso 4", id: "4", isFloor: true, customUrl: '' },
-        { name: "Bombeo terciario", id: "B3", isFloor: false, customUrl: '' },
+        { name: "Bombeo terciario", id: "B3", isFloor: false, customUrl: 'pumps/3' },
 
       ],
     },
@@ -32,9 +32,9 @@ const FloorSidebarComponent: React.FC<FloorSidebarProps> = ({
       name: "Edificio F",
       id: "F",
       floors: [
-        { name: "Bombeo primario y secundario", id: "B1,2", isFloor: false, customUrl: '' },
+        { name: "Bombeo primario y secundario", id: "B1,2", isFloor: false, customUrl: 'pumps/1,2' },
         { name: "Chillers", id: "C", isFloor: false, customUrl: 'chillers' },
-        { name: "Torres de enfriamiento", id: "T", isFloor: false, customUrl: '' },
+        { name: "Torres de enfriamiento", id: "T", isFloor: false, customUrl: 'cooling-towers' },
       ],
     },
   ];

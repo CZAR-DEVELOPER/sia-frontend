@@ -227,7 +227,7 @@ const VavPage: React.FC = () => {
         >
           <h2 className=" text-3xl mb-16">Controles VAV</h2>
 
-          {/* 🎛️ Control de Temperatura */}
+          {/* 🎛️ Control de Modo */}
           <div className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full">
             <div>
               <AvatarComponent variant="white" size="large">

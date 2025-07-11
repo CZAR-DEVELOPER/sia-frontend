@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAllUmas, UmaData, UmaResponse} from './uma_service';
 import axios from 'axios';
+import { UpdateUmaBPayload, updateUmaB } from './uma_service';
 
 
 // Get all UMAs for a specific building
@@ -58,127 +59,26 @@ export const useGetSingleUma = (building: string, floor: number) => {
   return { uma, loading, error };
 };
 
-
-// Component to turn on UMA
-
-export const useTurnOnUma = (floor: number) => {
-  const [loadingUseTurnOnUma, setLoadingUseTurnOnUma] = useState(false);
-  const [success, setSuccess] = useState<boolean | null>(null);
-
-  const turnOnUma = async (value: number = 151) => {
-    setLoadingUseTurnOnUma(true);
-    setSuccess(null);
-
-    try {
-      await axios.post(
-        `http://10.1.38.171:1880/post/umas/B${floor}/turn-on`,
-        { value },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      setSuccess(true);
-    } catch (error) {
-      console.error('Error al encender la UMA:', error);
-      setSuccess(false);
-    } finally {
-      setLoadingUseTurnOnUma(false);
-    }
-  };
-
-  return { turnOnUma, loadingUseTurnOnUma, success };
-};
-// Component to turn off UMA
-export const useTurnOffUma = (floor: number) => {
-  const [loadingUseTurnOffUma, setLoadingUseTurnOffUma] = useState(false);
-  const [success, setSuccess] = useState<boolean | null>(null);
-
-  const turnOffUma = async (value: number = 150) => {
-    setLoadingUseTurnOffUma(true);
-    setSuccess(null);
-
-    try {
-      await axios.post(
-        `http://10.1.38.171:1880/post/umas/B${floor}/turn-on`,
-        { value },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      setSuccess(true);
-    } catch (error) {
-      console.error('Error al encender la UMA:', error);
-      setSuccess(false);
-    } finally {
-      setLoadingUseTurnOffUma(false);
-    }
-  };
-
-  return { turnOffUma, loadingUseTurnOffUma, success };
-};
-
-// Component to set UMA frequency
-export const useSetUmaFrequency = (floor: number, value: number) => {
+export const useUpdateUmaB = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
-  const setFrequency = async () => {
+  const update = async (payload: UpdateUmaBPayload) => {
     setLoading(true);
     setSuccess(null);
+    setError(null);
 
     try {
-      await axios.post(
-        `http://10.1.38.171:1880/post/umas/B${floor}/freq`,
-        { value },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      await updateUmaB(payload);
       setSuccess(true);
-    } catch (error) {
-      console.error('Error al actualizar la frecuencia:', error);
+    } catch (err) {
+      setError(err);
       setSuccess(false);
     } finally {
       setLoading(false);
     }
   };
 
-  return { setFrequency, loading, success };
-};
-
-// Component to set UMA Vah
-export const useSetUmaVah = (floor: number, value: number) => {
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<boolean | null>(null);
-
-  const setVah = async () => {
-    setLoading(true);
-    setSuccess(null);
-
-    try {
-      await axios.post(
-        `http://10.1.38.171:1880/post/umas/B${floor}/vah`,
-        { value },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      setSuccess(true);
-    } catch (error) {
-      console.error('Error al actualizar VAH:', error);
-      setSuccess(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { setVah, loading, success };
+  return { update, loading, success, error };
 };

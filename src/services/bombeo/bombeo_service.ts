@@ -20,20 +20,7 @@ export interface BombeoResponseItem {
 //-------------------------👾 FUNCTIONS-------------------------
 
 //Get bombeos 3
-export const getBombeo3 = () =>
-  axios.get(`${NODERED_API}/get/bombeo3`, {
-    params: {
-      Cuarto: "CD",
-      Edificio: "C",
-    },
-  });
+export const getBombeo = (cuarto: string, edificio: string) =>
+  axios.get(`${NODERED_API}/get/bombeo?Cuarto=${encodeURIComponent(cuarto)}&Edificio=${encodeURIComponent(edificio)}`);
 
 //Get bombeos 1,2
-
-export const getBombeo1 = () =>
-  axios.get(`${NODERED_API}/get/bombeo1`, {
-    params: {
-      Cuarto: "Sec",
-      Edificio: "1",
-    },
-  });

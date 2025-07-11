@@ -23,3 +23,14 @@ export const turnOnUma = (
   umaId: "B1" | "B2" | "B3" | "B4",
   value: number,
 ) => axios.post<void>(`${NODERED_API}/post/umas/${umaId}/turn-on`, { value });
+
+/** Realiza una petición POST para actualizar la UMA B */
+export interface UpdateUmaBPayload {
+  floor: number;
+  Encendido: number;
+  Frecuencia: number;
+  Apertura: number;
+}
+
+export const updateUmaB = (payload: UpdateUmaBPayload) =>
+  axios.post(`${NODERED_API}/post/umas/actualizaB`, payload);

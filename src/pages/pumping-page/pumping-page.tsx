@@ -1,11 +1,11 @@
 // Simple React pumping page component
 import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 import ContainerComponent from "../../components/container/container_component";
 import PumpBlack from "../../assets/3d_models/pumps/pump_black.webm";
 import PumpBlue from "../../assets/3d_models/pumps/pump_blue.webm";
-import { useGetBombeo1, useGetBombeo3 } from "../../services/bombeo/bombre_hooks";
+import { useGetBombeo } from "../../services/bombeo/bombre_hooks";
 import LoadingComponent from "../../components/loading/loading_component";
 import ButtonComponent from "../../components/button/button_component";
 
@@ -14,16 +14,80 @@ const PumpingPage: React.FC = () => {
   const { numbers } = useParams();
   const pumps = numbers?.split(",").map(Number) || [];
 
+  //Get current value of 'cuarto' and 'edificio' from params
+
+  // Determine 'cuarto' value based on pumps[0] using switch-case
+  let cuarto = "";
+  switch (pumps[0]) {
+    case 1:
+      cuarto = "Chiller";
+      break;
+    case 3:
+      cuarto = "CD";
+      break;
+    default:
+      cuarto = "";
+      break;
+  }
+
+  // Determine 'edificio' value based on pumps[0] using switch-case
+  let edificio = "";
+  switch (pumps[0]) {
+    case 1:
+      edificio = "Sec";
+      break;
+    case 3:
+      edificio = "C";
+      break;
+    default:
+      edificio = "";
+      break;
+  }
   // HOOKS
 
-   const { bombeo1, loadingBombeo1, errorBombeo1 } = useGetBombeo1();
-   const { bombeo3, loadingBombeo3, errorBombeo3} = useGetBombeo3();
+   // Replace 'cuartoValue' and 'otherArg' with the actual values you need to pass
+  // Define the expected bombeo type
+  interface BombeoData {
+    chiller?: {
+      primarios: Array<{
+        Primario: number;
+        data: {
+          Comando: string;
+          Estado: string;
+        };
+      }>;
+      secundarios: Array<{
+        Secundario: number;
+        data: {
+          Comando: string;
+          Frecuencia: string;
+          Estado: string;
+        };
+      }>;
+    };
+    bombeos?: Array<{
+      Bombeo: number;
+      data: {
+        Comando: string;
+        Frecuencia: string;
+        Estado: string;
+      };
+    }>;
+    // Add other properties if needed
+  }
+
+  const { bombeo, loadingBombeo, errorBombeo } = useGetBombeo(cuarto, edificio) as {
+    bombeo: BombeoData | undefined;
+    loadingBombeo: boolean;
+    errorBombeo: boolean;
+  };
+   
 
 
-     if (loadingBombeo1 || loadingBombeo1 || loadingBombeo3 || errorBombeo3) {
+     if (loadingBombeo || errorBombeo ) {
     return (
       <div className="h-screen flex items-center justify-center">
-        {loadingBombeo1 || loadingBombeo3 ? (
+        {loadingBombeo ? (
           <LoadingComponent></LoadingComponent>
         ) : (
           <div className="text-center">
@@ -105,55 +169,51 @@ const PumpingPage: React.FC = () => {
               {/* STATUS SECTION */}
               <h2 className="text-lg my-4">Estatus</h2>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-                {pumps[0] == 3 &&
-                  bombeo3 &&
-                  bombeo3.map((item: any) => (
-                    <div key={item.Bombeo} className="bg-white rounded shadow p-4">
-                      <h3 className="font-semibold mb-2">Bombeo {item.Bombeo}</h3>
-                      <div className="text-sm">
-                        <div>Comando: {item.data.Comando}</div>
-                        <div>Frecuencia: {item.data.Frecuencia}</div>
-                        <div>Estado: {item.data.Estado}</div>
-                      </div>
+                {/* Render primarios and secundarios if pumps[0] == 1 */}
+                {pumps[0] == 1 && bombeo?.chiller && (
+                <div className="grid grid-cols-2  gap-4">
+                  {/* Primarios */}
+                  <div>
+                  <h3 className="font-semibold mb-2">Primarios</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    {bombeo.chiller.primarios.map((primario: any, idx: number) => (
+                    <div key={idx} className="bext-sm opacity-75 p-8 bg-gray-100 rounded-2xl mb-2">
+                      <div className="font-bold">Primario {primario.Primario}</div>
+                      <div>Comando: {primario.data.Comando}</div>
+                      <div>Estado: {primario.data.Estado}</div>
                     </div>
-                  ))
-                }
-
-                {pumps[0] == 1 && bombeo1 && (
-                  <>
-                    {/* Secundario */}
-                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {bombeo1
-                        .filter((item: any) => item.Secundario)
-                        .map((item: any) => (
-                          <div key={`secundario-${item.Secundario}`} className="bg-white rounded shadow p-4">
-                            <h3 className="font-semibold mb-2">Secundario {item.Secundario}</h3>
-                            <div className="text-sm">
-                              <div>Comando: {item.data.Comando}</div>
-                              <div>Frecuencia: {item.data.Frecuencia}</div>
-                              <div>Estado: {item.data.Estado}</div>
-                            </div>
-                          </div>
-                        ))}
+                    ))}
+                  </div>
+                  </div>
+                  {/* Secundarios */}
+                  <div >
+                  <h3 className="font-semibold mb-2">Secundarios</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    {bombeo.chiller.secundarios.map((secundario: any, idx: number) => (
+                    <div key={idx} className="ext-sm opacity-75 p-8 bg-gray-100 rounded-2xl mb-2">
+                      <div className="font-bold">Secundario {secundario.Secundario}</div>
+                      <div>Comando: {secundario.data.Comando}</div>
+                      <div>Frecuencia: {secundario.data.Frecuencia}</div>
+                      <div>Estado: {secundario.data.Estado}</div>
                     </div>
-                    {/* Primario */}
-                    <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {bombeo1
-                        .filter((item: any) => item.Primario)
-                        .map((item: any) => (
-                          <div key={`primario-${item.Primario}`} className="bg-white rounded shadow p-4">
-                            <h3 className="font-semibold mb-2">Primario {item.Primario}</h3>
-                            <div className="text-sm">
-                              <div>Comando: {item.data.Comando}</div>
-                              <div>Estado: {item.data.Estado}</div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </>
+                    ))}
+                  </div>
+                  </div>
+                </div>
                 )}
-              </div>
+
+                {pumps[0] == 3 && bombeo?.bombeos && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {bombeo.bombeos.map((bombeoItem: any, idx: number) => (
+                      <div key={idx} className="ext-sm opacity-75 p-8 bg-gray-100 rounded-2xl mb-2">
+                        <div className="font-bold">Bombeo {bombeoItem.Bombeo}</div>
+                        <div>Comando: {bombeoItem.data.Comando}</div>
+                        <div>Frecuencia: {bombeoItem.data.Frecuencia}</div>
+                        <div>Estado: {bombeoItem.data.Estado}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </section>
           </ContainerComponent>
         </div>

@@ -7,13 +7,13 @@ import UmaStandBy from "../../assets/3d_models/uma/uma_status_standby.png";
 import UmaWorking from "../../assets/3d_models/uma/uma_status_working.webm";
 import {
   useGetSingleUma,
-  useSetUmaFrequency,
-  useSetUmaVah,
-  useTurnOnUma,
+ 
 } from "../../services/uma/uma_hooks";
 import { useSearchParams } from "react-router-dom";
 import LoadingComponent from "../../components/loading/loading_component";
-import { useTurnOffUma } from "../../services/uma/uma_hooks";
+
+import LoadingGif from '../../assets/icons/loading.gif';
+import { updateUmaB } from "../../services/uma/uma_service";
 
 const UmaPage: React.FC = () => {
   //GET URL PARAMS
@@ -34,25 +34,10 @@ const UmaPage: React.FC = () => {
     level ? parseInt(level) : 0
   );
 
-  // Batch update the state with the UMA data
-  const { turnOnUma, loadingUseTurnOnUma, success } = useTurnOnUma(
-    level ? parseInt(level) : 0
-  );
-
-  const { turnOffUma, loadingUseTurnOffUma, success: successTurnOff } = useTurnOffUma(
-    level ? parseInt(level) : 0
-  );
-
-  const { setFrequency } = useSetUmaFrequency(
-    level ? parseInt(level) : 0,
-    umaState.frecuence
-  );
-  const { setVah } = useSetUmaVah(
-    level ? parseInt(level) : 0,
-    umaState.aperture
-  );
+ 
 
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true); // Estado para alternar la barra lateral
+  const [isUpdating, setIsUpdating] = React.useState(false);
 
   // Fill current state with data
   React.useEffect(() => {
@@ -66,17 +51,22 @@ const UmaPage: React.FC = () => {
   }, [uma.data]);
 
   const handleUpdateUma = async () => {
-    if (umaState.isPowerOn !== "Arranque") {
-      // Turn off UMA if not "Arranque"
-      await turnOffUma();
-    } else {
-      // Update frequency and aperture, then turn on UMA
-      await setFrequency();
-      await setVah();
-      await turnOnUma();
+    setIsUpdating(true);
+    const payload = {
+      floor: level ? parseInt(level) : 0,
+      Encendido: umaState.isPowerOn === "Arranque" ? 1 : 0,
+      Frecuencia: umaState.frecuence,
+      Apertura: umaState.aperture,
+    };
+    try {
+      await updateUmaB(payload);
+      alert("Los cambios tomarán un poco de tiempo en procesarse, recargue la página para verificar el estado en unos minutos");
+    } catch (error) {
+      alert("Error al actualizar la UMA. Intente nuevamente.");
     }
-    // Show alert to user
-    alert("Los cambios tomarán un poco de tiempo en procesarse, recargue la página para verificar el estado en unos minutos");
+    setTimeout(() => {
+      window.location.reload();
+    }, 15000);
   };
   
 
@@ -231,21 +221,42 @@ const UmaPage: React.FC = () => {
             </div>
             <div>
               <div className={umaState.isPowerOn === "Error" ? "opacity-50" : ""}>
-                <select
-                  disabled={umaState.isPowerOn === "Error"}
-                  className="w-full bg-gray-200 rounded p-2 border-none outline-none p-0 m-0 text-center"
-                  value={umaState.isPowerOn}
-                  onChange={(e) => {
-                    setUmaState((prevState) => ({
-                      ...prevState,
-                      isPowerOn: e.target.value,
-                    }));
-                  }}
-                >
-                  <option value={"error"} disabled>Error</option>
-                  <option value={"Paro"}>Paro</option>
-                  <option value={"Arranque"}>Encendido</option>
-                </select>
+                <div className="flex items-end justify-end">
+                  <span className="me-4 text-sm opacity-75">
+                    {umaState.isPowerOn === "Arranque"
+                      ? "Encendido"
+                      : umaState.isPowerOn === "Paro"
+                      ? "Apagado"
+                      : "Error"}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={umaState.isPowerOn === "Error"}
+                    aria-pressed={umaState.isPowerOn === "Arranque"}
+                    className={`relative w-20 h-10 rounded-full transition-colors duration-300
+                      ${umaState.isPowerOn === "Error"
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : umaState.isPowerOn === "Arranque"
+                        ? "bg-orange-500"
+                        : "bg-gray-500"
+                      }`}
+                    onClick={() => {
+                      if (umaState.isPowerOn !== "Error") {
+                        setUmaState((prevState) => ({
+                          ...prevState,
+                          isPowerOn: prevState.isPowerOn === "Arranque" ? "Paro" : "Arranque",
+                        }));
+                      }
+                    }}
+                  >
+                    <span
+                      className={`absolute top-1 left-1 transition-transform duration-300
+                      w-8 h-8 rounded-full bg-white shadow
+                      ${umaState.isPowerOn === "Arranque" ? "translate-x-10" : ""}
+                      `}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -362,17 +373,15 @@ const UmaPage: React.FC = () => {
           {/* 📧 Boton enviar */}
           <div className="mt-16">
             <ButtonComponent
-            disabled={umaState.isPowerOn === "Error"}
+            disabled={umaState.isPowerOn === "Error" || isUpdating}
               className="flex justify-center items-center"
               onClick={() => {
-                //Hide the sidebar
                 handleUpdateUma();
-                //Send the data to the server
-
-
               }}
             >
-                {umaState.isPowerOn === "Error" ? (
+                {isUpdating ? (
+                  <img src={LoadingGif} alt="Cargando..." className="h-6 w-6" />
+                ) : umaState.isPowerOn === "Error" ? (
                 <span className="me-2">Error en el estado, revise la conexion</span>
                 ) : umaState.isPowerOn !== "Arranque" ? (
                 <span className="me-2">Apagar UMA</span>
