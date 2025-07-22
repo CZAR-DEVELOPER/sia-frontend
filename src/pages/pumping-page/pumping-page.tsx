@@ -12,6 +12,8 @@ import {
   BombPriPayload,
   BombSecPayload,
   BombTerPayload,
+  postBombPri,
+  postBombTer,
 } from "../../services/bombeo/bombeo_service";
 import AvatarComponent from "../../components/avatar/avatar_component";
 
@@ -50,6 +52,8 @@ const PumpingPage: React.FC = () => {
       break;
   }
   // HOOKS
+
+  let [isPostingData, setisPostingData] = useState<boolean>(false);
 
   // Replace 'cuartoValue' and 'otherArg' with the actual values you need to pass
   // Define the expected bombeo type
@@ -302,45 +306,85 @@ const PumpingPage: React.FC = () => {
                       )}
                     </div>
 
-                    {/* 🎛️  Control de encendido/apagado Primarios */}
+                    {/* 🎛️  Control de encendido/apagado y frecuencia Primarios */}
                     {[primario1State, primario2State, primario3State].map((primarioState, idx) => (
                       <div
                       key={idx}
-                      className="grid grid-cols-[auto_1fr_2fr] items-center my-4 gap-4 w-full"
+                      className="grid grid-cols-[auto_1fr] items-center my-4 gap-4 w-full"
                       >
-                      <div>
+                      <div className="self-start">
                         <AvatarComponent variant="light" size="large">
                         {idx +1}
                         </AvatarComponent>
                       </div>
                       <div>
-                        <h3 className="text font-bold">Primario {idx + 1}</h3>
-                        <p className="text-sm opacity-50">
-                        {primarioState?.Comando === 1 ? "Encendido" : "Apagado"}
-                        </p>
-                      </div>
-                      <div className="flex justify-end">
-                        <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={primarioState?.Comando === 1}
-                          onChange={() => {
-                          // Aquí deberías implementar la lógica para encender/apagar la bomba
-                          // Por ejemplo, llamar a una función que haga el request correspondiente
-                          // setPrimarioXState({ ...primarioState, Comando: primarioState?.Comando === 1 ? 0 : 1 })
-                          }}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 rounded-full transition-all relative">
-                          <span
-                          className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                            primarioState?.Comando === 1 ? "translate-x-5 bg-blue-600" : ""
-                          }`}
-                          ></span>
+                        {/* Switch row */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h3 className="text font-bold">Primario {idx + 1}</h3>
+                            <p className="text-sm opacity-50">
+                            {primarioState?.Comando === 1 ? "Encendido" : "Apagado"}
+                            </p>
+                          </div>
+                          <label className="inline-flex items-center cursor-pointer" style={{ opacity: isPostingData ? 0.5 : 1 }}>
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            disabled={isPostingData}
+                            checked={primarioState?.Comando === 1}
+                            onChange={() => {
+                            if (idx === 0) {
+                              setPrimario1State(prev =>
+                              prev
+                                ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                : null
+                              );
+                            } else if (idx === 1) {
+                              setPrimario2State(prev =>
+                              prev
+                                ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                : null
+                              );
+                            } else if (idx === 2) {
+                              setPrimario3State(prev =>
+                              prev
+                                ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                : null
+                              );
+                            }
+                            }}
+                          />
+                          <div className={`w-11 h-6 rounded-full transition-all relative ${primarioState?.Comando === 1 ? "bg-orange-400" : "bg-gray-200"}`}>
+                            <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${primarioState?.Comando === 1 ? "translate-x-5 bg-blue-600" : ""}`}></span>
+                          </div>
+                          </label>
                         </div>
-                        </label>
+                        {/* No frequency for primario, only switch */}
+                        <div className="flex justify-end mt-1">
+                          <ButtonComponent
+                            size="sm"
+                            disabled={isPostingData}
+                            onClick={async () => {
+                              setisPostingData(true);
+                              if (idx === 0) {
+                                await postBombPri(primario1State!);
+                              } else if (idx === 1) {
+                                await postBombPri(primario2State!);
+                              } else if (idx === 2) {
+                                await postBombPri(primario3State!);
+                              }
+                              setTimeout(() => {
+                                setisPostingData(false);
+                                alert("Actualizacion de estado solicitada exitosamente, espere unos minutos para ver los cambios (Si no se actualiza, refresque la pagina)");
+                                window.location.reload();
+                              }, 30000);
+                            }}
+                          >
+                            {isPostingData ? "Enviado..." : "Actualizar estado →"}
+                          </ButtonComponent>
+                        </div>
                       </div>
-                      </div>
+                    </div>
                     ))}
                    
                   </div>
@@ -365,6 +409,7 @@ const PumpingPage: React.FC = () => {
                       )}
                     </div>
 
+                    {/* 🎛️  Control de encendido/apagado y frecuencia Secundarios */}
                     {[secundario1State, secundario2State, secundario3State].map((secundarioState, idx) => (
                       <div
                         key={idx}
@@ -376,34 +421,47 @@ const PumpingPage: React.FC = () => {
                           </AvatarComponent>
                         </div>
                         <div>
-                            {/* Switch row */}
-                            <div className="flex items-center justify-between mb-2">
+                          {/* Switch row */}
+                          <div className="flex items-center justify-between mb-2">
                             <div>
                               <h3 className="text font-bold">Secundario {idx + 1}</h3>
                               <p className="text-sm opacity-50">
                               {secundarioState?.Comando === 1 ? "Encendido" : "Apagado"}
                               </p>
                             </div>
-                            <label className="inline-flex items-center cursor-pointer">
+                            <label className="inline-flex items-center cursor-pointer" style={{ opacity: isPostingData ? 0.5 : 1 }}>
                               <input
                               type="checkbox"
                               className="sr-only peer"
+                              disabled={isPostingData}
                               checked={secundarioState?.Comando === 1}
                               onChange={() => {
-                                // Implement logic to toggle pump on/off
-                                // Example:
-                                // setSecundarioXState({ ...secundarioState, Comando: secundarioState?.Comando === 1 ? 0 : 1 })
+                                if (idx === 0) {
+                                  setSecundario1State(prev =>
+                                    prev
+                                      ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                      : null
+                                  );
+                                } else if (idx === 1) {
+                                  setSecundario2State(prev =>
+                                    prev
+                                      ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                      : null
+                                  );
+                                } else if (idx === 2) {
+                                  setSecundario3State(prev =>
+                                    prev
+                                      ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                      : null
+                                  );
+                                }
                               }}
                               />
-                              <div className="w-11 h-6 bg-gray-200 rounded-full transition-all relative">
-                              <span
-                                className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                                secundarioState?.Comando === 1 ? "translate-x-5 bg-blue-600" : ""
-                                }`}
-                              ></span>
+                              <div className={`w-11 h-6 rounded-full transition-all relative ${secundarioState?.Comando === 1 ? "bg-orange-400" : "bg-gray-200"}`}>
+                                <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${secundarioState?.Comando === 1 ? "translate-x-5 bg-blue-600" : ""}`}></span>
                               </div>
                             </label>
-                            </div>
+                          </div>
                           {/* Slider row */}
                           <div className="flex flex-col gap-1 w-full">
                             <div>
@@ -415,10 +473,16 @@ const PumpingPage: React.FC = () => {
                                   value={secundarioState?.Frecuencia ?? 0}
                                   max={55}
                                   min={18}
-                                  disabled={secundarioState?.Comando !== 1}
+                                  disabled={secundarioState?.Comando !== 1 || isPostingData}
                                   onChange={e => {
-                                    // Implement logic to update frequency in state
-                                    // setSecundarioXState({ ...secundarioState, Frecuencia: Number(e.target.value) })
+                                    const value = Number(e.target.value);
+                                    if (idx === 0) {
+                                      setSecundario1State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                    } else if (idx === 1) {
+                                      setSecundario2State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                    } else if (idx === 2) {
+                                      setSecundario3State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                    }
                                   }}
                                 />
                                 Hz
@@ -431,23 +495,40 @@ const PumpingPage: React.FC = () => {
                                 value={secundarioState?.Frecuencia ?? 0}
                                 max={55}
                                 min={18}
-                                disabled={secundarioState?.Comando !== 1}
+                                disabled={secundarioState?.Comando !== 1 || isPostingData}
                                 onChange={e => {
-                                  // Implement logic to update frequency in state
-                                  // setSecundarioXState({ ...secundarioState, Frecuencia: Number(e.target.value) })
+                                  const value = Number(e.target.value);
+                                  if (idx === 0) {
+                                    setSecundario1State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                  } else if (idx === 1) {
+                                    setSecundario2State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                  } else if (idx === 2) {
+                                    setSecundario3State(prev => prev ? { ...prev, Frecuencia: value } : null);
+                                  }
                                 }}
                               />
                             </div>
                             <div className="flex justify-end mt-1">
                               <ButtonComponent
                                 size="sm"
-                                onClick={() => {
-                                  // Implement logic to send frequency update
-                                  // Example: sendSecundarioFrecuenciaUpdate(secundarioState)
+                                disabled={isPostingData}
+                                onClick={async () => {
+                                  setisPostingData(true);
+                                  if (idx === 0) {
+                                    await postBombPri(secundario1State!);
+                                  } else if (idx === 1) {
+                                    await postBombPri(secundario2State!);
+                                  } else if (idx === 2) {
+                                    await postBombPri(secundario3State!);
+                                  }
+                                  setTimeout(() => {
+                                    setisPostingData(false);
+                                    alert("Actualizacion de estado solicitada exitosamente, espere unos minutos para ver los cambios (Si no se actualiza, refresque la pagina)");
+                                    window.location.reload();
+                                  }, 30000);
                                 }}
-                                disabled={secundarioState?.Comando !== 1}
                               >
-                                Actualizar
+                                {isPostingData ? "Enviado..." : "Actualizar estado →"}
                               </ButtonComponent>
                             </div>
                           </div>
@@ -488,73 +569,123 @@ const PumpingPage: React.FC = () => {
                         {/* Switch row */}
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <h3 className="text font-bold">Terciario {idx + 1}</h3>
-                            <p className="text-sm opacity-50">
-                              {terciarioState?.Comando === 1 ? "Encendido" : "Apagado"}
-                            </p>
+                          <h3 className="text font-bold">Terciario {idx + 1}</h3>
+                          <p className="text-sm opacity-50">
+                            {terciarioState?.Comando === 1 ? "Encendido" : "Apagado"}
+                          </p>
                           </div>
                           <label className="inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={terciarioState?.Comando === 1}
-                              onChange={() => {
-                                // Implement logic to toggle pump on/off
-                                // setTerciarioXState({ ...terciarioState, Comando: terciarioState?.Comando === 1 ? 0 : 1 })
-                              }}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 rounded-full transition-all relative">
-                              <span
-                                className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                                  terciarioState?.Comando === 1 ? "translate-x-5 bg-blue-600" : ""
-                                }`}
-                              ></span>
-                            </div>
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            disabled={isPostingData}
+                            checked={terciarioState?.Comando === 1}
+                            onChange={() => {
+                            if (idx === 0) {
+                              setTerciario1State(prev =>
+                              prev
+                                ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                : null
+                              );
+                            } else if (idx === 1) {
+                              setTerciario2State(prev =>
+                              prev
+                                ? { ...prev, Comando: prev.Comando === 1 ? 0 : 1 }
+                                : null
+                              );
+                            }
+                            }}
+                          />
+                            <div
+                            className={`w-11 h-6 rounded-full transition-all relative ${
+                              terciarioState?.Comando === 1
+                              ? "bg-orange-400"
+                              : "bg-gray-200"
+                            }`}
+                            >
+                            <span
+                              className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
+                              terciarioState?.Comando === 1
+                                ? "translate-x-5 bg-blue-600"
+                                : ""
+                              }`}
+                            ></span>
+                          </div>
                           </label>
                         </div>
                         {/* Slider row */}
                         <div className="flex flex-col gap-1 w-full">
                           <div>
-                            <h3 className="small">Frecuencia</h3>
-                            <p className="text-sm opacity-50 flex items-center gap-1">
-                              <input
-                                type="number"
-                                className="w-12 text-center bg-transparent border-none outline-none p-0 m-0"
-                                value={terciarioState?.Frecuencia ?? 0}
-                                max={55}
-                                min={18}
-                                disabled={terciarioState?.Comando !== 1}
-                                onChange={e => {
-                                  // setTerciarioXState({ ...terciarioState, Frecuencia: Number(e.target.value) })
-                                }}
-                              />
-                              Hz
-                            </p>
+                          <h3 className="small">Frecuencia</h3>
+                          <p className="text-sm opacity-50 flex items-center gap-1">
+                            <input
+                            type="number"
+                            className="w-12 text-center bg-transparent border-none outline-none p-0 m-0"
+                            value={terciarioState?.Frecuencia ?? 0}
+                            max={55}
+                            min={18}
+                            disabled={terciarioState?.Comando !== 1 || isPostingData}
+                            onChange={e => {
+                              const value = Number(e.target.value);
+                              if (idx === 0) {
+                              setTerciario1State(prev =>
+                                prev ? { ...prev, Frecuencia: value } : null
+                              );
+                              } else if (idx === 1) {
+                              setTerciario2State(prev =>
+                                prev ? { ...prev, Frecuencia: value } : null
+                              );
+                              }
+                            }}
+                            />
+                            Hz
+                          </p>
                           </div>
                           <div>
-                            <input
-                              type="range"
-                              className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
-                              value={terciarioState?.Frecuencia ?? 0}
-                              max={55}
-                              min={18}
-                              disabled={terciarioState?.Comando !== 1}
-                              onChange={e => {
-                                // setTerciarioXState({ ...terciarioState, Frecuencia: Number(e.target.value) })
-                              }}
-                            />
+                          <input
+                            type="range"
+                            className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
+                            value={terciarioState?.Frecuencia ?? 0}
+                            max={55}
+                            min={18}
+                            disabled={terciarioState?.Comando !== 1 || isPostingData}
+                            onChange={e => {
+                            const value = Number(e.target.value);
+                            if (idx === 0) {
+                              setTerciario1State(prev =>
+                              prev ? { ...prev, Frecuencia: value } : null
+                              );
+                            } else if (idx === 1) {
+                              setTerciario2State(prev =>
+                              prev ? { ...prev, Frecuencia: value } : null
+                              );
+                            }
+                            }}
+                          />
                           </div>
-                          <div className="flex justify-end mt-1">
+                          
+                            <div className="flex justify-end mt-1">
                             <ButtonComponent
                               size="sm"
-                              onClick={() => {
-                                // Implement logic to send frequency update
-                                // sendTerciarioFrecuenciaUpdate(terciarioState)
+                              disabled={isPostingData}
+                              onClick={async () => {
+                              setisPostingData(true);
+                              if (idx === 0) {
+                                await postBombTer(terciario1State!);
+                              } else if (idx === 1) {
+                                await postBombTer(terciario2State!);
+                              }
+                              // Wait 20 seconds before showing alert
+                              setTimeout(() => {
+                                setisPostingData(false);
+                                alert("Actualizacion de estado solicitada exitosamente, espere unos minutos para ver los cambios (Si no se actualiza, refresque la pagina)");
+                                window.location.reload();
+                              }, 30000);
                               }}
-                              disabled={terciarioState?.Comando !== 1}
                             >
-                              Actualizar
+                              {isPostingData ? "Enviado..." : "Actualizar estado →"}
                             </ButtonComponent>
+                            
                           </div>
                         </div>
                       </div>
