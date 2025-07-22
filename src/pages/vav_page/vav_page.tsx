@@ -163,9 +163,9 @@ const VavPage: React.FC = () => {
                 <div
                   className="text-sm opacity-75 p-8 bg-gray-100  rounded-2xl"
                 >
-                  <p className="text-sm">Mode</p>
+                  <p className="text-sm">Modo</p>
                   <p>
-                    <span className="text-xl ">{device?.mode == 0 ? "Automatico": "Manual"}</span>
+                    <span className="text-xl ">{device?.mode == 0 ? "Manual": "Automatico"}</span>
                   </p>
                 </div>
 
@@ -252,8 +252,8 @@ const VavPage: React.FC = () => {
                   }));
                 }}
               >
-                <option value={0}>Automatico</option>
-                <option value={1}>Manual</option>
+                <option value={0}>Manual</option>
+                <option value={1}>Automatico</option>
               </select>
             </div>
           </div>

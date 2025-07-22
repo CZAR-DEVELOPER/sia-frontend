@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getBombeo,  } from './bombeo_service';
+import { BombPriPayload, BombSecPayload, BombTerPayload, getBombeo, postBombPri, postBombSec, postBombTer,  } from './bombeo_service';
 // Get bombeos
 export const useGetBombeo = (cuartoValue: string, secondArg: any) => {
   const [bombeo, setBombeo] = useState();
@@ -22,4 +22,77 @@ export const useGetBombeo = (cuartoValue: string, secondArg: any) => {
   }, [cuartoValue, secondArg]);
 
   return { bombeo, loadingBombeo, errorBombeo };
+};
+
+//Update Bombeo 1
+export const usePostBombPri = () => {
+  const [response, setResponse] = useState<any>();      // <— any / undefined
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  const sendCommand = async (payload: BombPriPayload): Promise<any> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await postBombPri(payload);
+      setResponse(res.data);  // res.data is `any`
+      return res.data;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendCommand, response, loading, error };
+};
+
+// Update bombeo 2
+export const usePostBombSec = () => {
+  const [response, setResponse] = useState<any>();   // any / undefined
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  const sendCommand = async (payload: BombSecPayload): Promise<any> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await postBombSec(payload);
+      setResponse(res.data);        // res.data is `any`
+      return res.data;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendCommand, response, loading, error };
+  
+};
+
+// Update bombeo 3
+export const usePostBombTer = () => {
+  const [response, setResponse] = useState<any>();      // any / undefined
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  const sendCommand = async (payload: BombTerPayload): Promise<any> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await postBombTer(payload);
+      setResponse(res.data);  // res.data is `any`
+      return res.data;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendCommand, response, loading, error };
 };

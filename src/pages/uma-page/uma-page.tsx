@@ -66,7 +66,7 @@ const UmaPage: React.FC = () => {
     }
     setTimeout(() => {
       window.location.reload();
-    }, 25000);
+    }, 35000);
   };
   
 
@@ -367,8 +367,7 @@ const UmaPage: React.FC = () => {
 
             </section>
 
-            {umaState.isPowerOn}
-
+     
 
           {/* 📧 Boton enviar */}
           <div className="mt-16">
