@@ -26,6 +26,21 @@ const ChillersPage: React.FC = () => {
     temperatura_retorno_condensados: 0,
   });
 
+  // Update state when data is fetched
+  React.useEffect(() => {
+    if (chillersData && chillersData.data) {
+      setChillerState(prev => ({
+        ...prev,
+        chiller_1: chillersData.data.Chiller_1 ?? prev.chiller_1,
+        chiller_2: chillersData.data.Chiller_2 ?? prev.chiller_2,
+        chiller_3: chillersData.data.Chiller_3 ?? prev.chiller_3,
+        temperatura_inyeccion_helada: chillersData.data.SupplyTemp ?? prev.temperatura_inyeccion_helada,
+        temperatura_retorno_helada: chillersData.data.ReturnTemp ?? prev.temperatura_retorno_helada,
+        temperatura_retorno_condensados: chillersData.data.CondensedTemp ?? prev.temperatura_retorno_condensados,
+      }));
+    }
+  }, [chillersData]);
+
   const chillersList = [
     {
       id: "chiller_1",
@@ -100,6 +115,10 @@ const ChillersPage: React.FC = () => {
     );
   }
 
+  // Update state when data is fetched
+
+  
+
   return (
     <div className="h-screen flex flex-col">
       {/* Navbar */}
@@ -124,7 +143,13 @@ const ChillersPage: React.FC = () => {
                     <h2 className="text-xl my-4 text-center">
                       {chiller.label}
                     </h2>
-                    <p className="opacity-50">{chiller.status ? "Prendido" : "Apagado"}</p>
+                    
+                    <p className={` ${chiller.status ? "text-green-600 opacity-100" : "opacity-50"} `}>
+                      <div className="w-3 h-3 rounded-full mr-2 inline-block" style={{ backgroundColor: chiller.status ? 'green' : 'gray' }}>
+                  
+                      </div>
+                      {chiller.status ? "Prendido" : "Apagado"}
+                    </p>
                   </div>
                 </div>
                 <div className="bg-gray-50/25 w-full h-65 my-6 flex items-center justify-center">
@@ -140,13 +165,7 @@ const ChillersPage: React.FC = () => {
 
           {/* 📉 Data section */}
           <section
-            className={`${
-              !chillersState.chiller_1 ||
-              !chillersState.chiller_2 ||
-              !chillersState.chiller_3
-                ? "pointer-events-none opacity-50"
-                : ""
-            }`}
+           
           >
             {/* STATUS SECTION */}
             <h2 className="text-lg my-4">Estatus</h2>
