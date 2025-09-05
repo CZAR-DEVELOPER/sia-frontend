@@ -113,7 +113,6 @@ const CoolingTowersPage: React.FC = () => {
             <div className="bg-gray-50/25  w-full h-100 my-2 flex items-center justify-center ">
             {/* <img src={VavStandby} alt="UMA" className=" h-full object-fit" /> */}
 
-            <img src={CoolingTowerOn1} />
             <div className="relative w-full h-full flex items-center justify-center">
               <video
               src={CoolingTowerModel}
