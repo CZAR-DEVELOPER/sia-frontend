@@ -50,7 +50,7 @@ const CoolingTowersPage: React.FC = () => {
     if (tower1 && tower2) return CoolingTowerOnBoth;
     if (tower1) return CoolingTowerOn1;
     if (tower2) return CoolingTowerOn2;
-    return null;
+    return CoolingTowerOnBoth;
   }
 
   // Loading and error handling
@@ -112,7 +112,8 @@ const CoolingTowersPage: React.FC = () => {
       {/* ANIMATIONS SECTIONS */}
             <div className="bg-gray-50/25  w-full h-100 my-2 flex items-center justify-center ">
             {/* <img src={VavStandby} alt="UMA" className=" h-full object-fit" /> */}
-            
+
+            <img src={CoolingTowerOn1} />
             <div className="relative w-full h-full flex items-center justify-center">
               <video
               src={CoolingTowerModel}
@@ -125,7 +126,7 @@ const CoolingTowersPage: React.FC = () => {
               ></video>
               {getCoolingTowerImage(coolingTowersState) && (
               <img
-                src={getCoolingTowerImage(coolingTowersState)!}
+                src={CoolingTowerOn1}
                 alt="Estado Torres"
                 className="absolute top-0 left-0 w-full h-full object-contain pointer-events-none"
                 style={{ zIndex: 2 }}
