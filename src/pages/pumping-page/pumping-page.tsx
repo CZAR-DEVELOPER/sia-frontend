@@ -8,6 +8,7 @@ import PumpBlue from "../../assets/3d_models/pumps/pump_blue.webm";
 import { useGetBombeo } from "../../services/bombeo/bombre_hooks";
 import LoadingComponent from "../../components/loading/loading_component";
 import ButtonComponent from "../../components/button/button_component";
+
 import {
   BombPriPayload,
   BombSecPayload,
@@ -16,6 +17,10 @@ import {
   postBombTer,
 } from "../../services/bombeo/bombeo_service";
 import AvatarComponent from "../../components/avatar/avatar_component";
+
+import Light1 from "../../assets/3d_models/pumps/light_1.png";
+import Light2 from "../../assets/3d_models/pumps/light_2.png";
+import Light3 from "../../assets/3d_models/pumps/light_3.png";
 
 const PumpingPage: React.FC = () => {
   //Get url params
@@ -266,14 +271,22 @@ const PumpingPage: React.FC = () => {
             >
               {pumps.map((pump, index) => (
                 <div key={index} className="flex items-center justify-center">
-                  <video
-                    src={pump % 2 === 1 ? PumpBlue : PumpBlack}
-                    autoPlay
-                    loop
-                    muted
-                    controls={false}
-                    className="h-90"
-                  ></video>
+                  <div className="relative flex flex-col items-center">
+                    {/* Lights mask above the pump video */}
+                    <div className="flex justify-center gap-2 mb-2">
+                      <img src={Light1} alt="Light 1" className="w-12 h-12 object-contain" />
+                      <img src={Light2} alt="Light 2" className="w-12 h-12 object-contain" />
+                      <img src={Light3} alt="Light 3" className="w-12 h-12 object-contain" />
+                    </div>
+                    <video
+                      src={pump % 2 === 1 ? PumpBlue : PumpBlack}
+                      autoPlay
+                      loop
+                      muted
+                      controls={false}
+                      className="h-90"
+                    ></video>
+                  </div>
                 </div>
               ))}{" "}
             </div>
