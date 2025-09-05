@@ -2,25 +2,100 @@ import React from "react";
 import NavbarComponent from "../../components/navbar/navbar-component";
 import ContainerComponent from "../../components/container/container_component";
 import CoolingTowerModel from "../../assets/3d_models/cooling_towers/cooling_towers.webm";
+import { useCoolingTowers } from "../../services/cooling_towers/cooling_hooks";
+import LoadingComponent from "../../components/loading/loading_component";
+import ButtonComponent from "../../components/button/button_component";
+
+import CoolingTowerOn1 from "../../assets/3d_models/cooling_towers/cooling_towers_on_1.webm";
+import CoolingTowerOn2 from "../../assets/3d_models/cooling_towers/cooling_towers_on_2.webm";
+import CoolingTowerOnBoth from "../../assets/3d_models/cooling_towers/cooling_towers_on_both.webm";
 
 const CoolingTowersPage: React.FC = () => {
+
+  // HOOK cooling towers
+  const { coolingTowersData, loading, error } = useCoolingTowers();
+ 
   const [coolingTowersState, setCoolingTowersState] = React.useState([
     {
-      value: 0,
-      label: "Temp. de retorno condensados",
-      unit: "°C",
+      value: false,
+      label: "Estado Torre 1",
     },
     {
-      value: 0,
-      label: "Temp. exterior",
-      unit: "°C",
+      value: false,
+      label: "Estado Torre 2",
     },
   ]);
+
+  React.useEffect(() => {
+    if (
+      coolingTowersData &&
+      coolingTowersData.status === "ok" &&
+      coolingTowersData.data
+    ) {
+      setCoolingTowersState([
+        {
+          value: coolingTowersData.data.Torre1 === "Encendido",
+          label: "Estado Torre 1",
+        },
+        {
+          value: coolingTowersData.data.Torre2 === "Encendido",
+          label: "Estado Torre 2",
+        },
+      ]);
+    }
+  }, [coolingTowersData]);
+
+  function getCoolingTowerImage(state: { value: boolean }[]) {
+    const [tower1, tower2] = state.map(s => s.value);
+    if (tower1 && tower2) return CoolingTowerOnBoth;
+    if (tower1) return CoolingTowerOn1;
+    if (tower2) return CoolingTowerOn2;
+    return CoolingTowerModel;
+  }
+
+  // Loading and error handling
+  if (loading || error) {
+    console.log("Loading or error state detected:", { loading, error });
+    return (
+      <div className="h-screen flex items-center justify-center">
+        {loading ? (
+          <LoadingComponent></LoadingComponent>
+        ) : (
+          <div className="text-center">
+            <h1 className="text-2xl mb-5">Ocurrió un error</h1>
+            <p className="text-sm text-gray-500">
+              No se pudo obtener los datos. Por favor, revise la conexion de los
+              dispositivos y NodeRed.
+            </p>
+            <ButtonComponent
+              className="mt-4"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Volver a intentar
+            </ButtonComponent>
+
+            <ButtonComponent
+              className="mt-4"
+              style="text"
+              size="sm"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Regresar al inicio
+            </ButtonComponent>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col">
       {/* Navbar */}
-      <NavbarComponent title="Visualizacion de torres de enfriamiento" />
+      <NavbarComponent title="Torres de enfriamiento" />
 
       {/* Main content */}
       <div className="grid grid-cols-[1fr_auto] h-full ">
@@ -39,7 +114,7 @@ const CoolingTowersPage: React.FC = () => {
             {/* <img src={VavStandby} alt="UMA" className=" h-full object-fit" /> */}
             
             <video
-              src={CoolingTowerModel}
+              src={getCoolingTowerImage(coolingTowersState)}
               autoPlay
               loop
               muted
@@ -61,8 +136,7 @@ const CoolingTowersPage: React.FC = () => {
                 >
                   <p className="text-sm">{status.label}</p>
                   <p>
-                    <span className="text-xl ">{status.value}</span>
-                    <span className="text-sm"> {status.unit}</span>
+                <span className="text-xl ">{status.value ? "Encendido" : "Apagada"}</span>
                   </p>
                 </div>
               ))}
