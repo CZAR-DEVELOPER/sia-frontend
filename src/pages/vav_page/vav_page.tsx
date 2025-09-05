@@ -21,6 +21,7 @@ interface VavModel {
   temperature: number;
   offset: number;
   aperturePercentage: number;
+  setpoint?: number;
 }
 
 const VavPage: React.FC = () => {
@@ -54,6 +55,7 @@ const VavPage: React.FC = () => {
         temperature: device.temp ?? 0,
         offset: device.offset ?? 0,
         aperturePercentage: device.aperture ?? 0,
+        setpoint: device.setpoint ?? 0,
       });
     }
   }, [loading, device]);
@@ -276,18 +278,18 @@ const VavPage: React.FC = () => {
               </AvatarComponent>
             </div>
             <div>
-              <h3 className="small">Temperatura</h3>
+              <h3 className="small">SetPoint</h3>
               <p className="text-sm opacity-50">
                 <input
                   type="number"
                   className="w-12 text-center bg-transparent border-none outline-none p-0 m-0 "
-                  value={vavControllerState.temperature ?? 0}
+                  value={vavControllerState.setpoint ?? 0}
                   onChange={(e) => {
-                    // Update temperature value
+                    // Update setpoint value
                     const newValue = parseInt(e.target.value);
                     setVavControllerState((prevState) => ({
                       ...prevState,
-                      temperature: isNaN(newValue) ? 0 : newValue,
+                      setpoint: isNaN(newValue) ? 0 : newValue,
                     }));
                   }}
                   max={23}
@@ -302,13 +304,13 @@ const VavPage: React.FC = () => {
                 min="19"
                 max="23"
                 className="appearance-none w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-black"
-                value={vavControllerState.temperature ?? 0}
+                value={vavControllerState.setpoint ?? 0}
                 onChange={(e) => {
-                  // Update temperature value
+                  // Update setpoint value
                   const newValue = parseInt(e.target.value);
                   setVavControllerState((prevState) => ({
                     ...prevState,
-                    temperature: isNaN(newValue) ? 0 : newValue,
+                    setpoint: isNaN(newValue) ? 0 : newValue,
                   }));
                 }}
                 
@@ -423,8 +425,10 @@ const VavPage: React.FC = () => {
                   Ap: 1,
                   C: 0,
                   Modo: vavControllerState.mode,
-                  SP: vavControllerState.temperature, // 450 in your example, adjust as needed
+                  SP: vavControllerState.setpoint,
                   offset: vavControllerState.offset,
+                  Temp: vavControllerState.temperature ?? 0,
+                  Apertura: vavControllerState.aperturePercentage ?? 0,
                 })
                   .then(() => {
                   alert("Datos enviados correctamente");

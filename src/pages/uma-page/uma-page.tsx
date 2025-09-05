@@ -45,7 +45,7 @@ const UmaPage: React.FC = () => {
       setUmaState({
         isPowerOn: uma.data.Estado,
         frecuence: uma.data.Frecuencia,
-        aperture: uma.data["Temperatura de inyección"],
+        aperture: uma.data["Válvula"],
       });
     }
   }, [uma.data]);

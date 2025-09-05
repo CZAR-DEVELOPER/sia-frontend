@@ -7,6 +7,7 @@ export interface VavDevice {
   temp?: number | null;
   offset?: number | null;
   aperture?: number | null;
+  setpoint?: number | null;
 }
 
 // Get all VAV devices for a specific floor
