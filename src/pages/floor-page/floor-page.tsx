@@ -2305,9 +2305,9 @@ const FloorPage: React.FC = () => {
           if (device.temp) {
             if (device.temp < 20) {
                 point.color = "#0096ff"; // Blue for low range
-            } else if (device.temp >= 20 && device.temp < 22) {
+            } else if (device.temp >= 20 && device.temp < 23.5) {
                 point.color = "#01a836"; // Green for medium range
-            } else if (device.temp >= 22) {
+            } else if (device.temp >= 23.5) {
               point.color = "#e20000"; // Red for high range
             }
           }

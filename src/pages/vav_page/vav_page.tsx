@@ -178,9 +178,9 @@ const VavPage: React.FC = () => {
       ? "bg-gray-950 text-gray-600"
       : device.temp < 20
       ? "bg-blue-600"                     // azul para < 20 °C
-      : device.temp < 22
-      ? "bg-green-600"                    // verde para 20–21.9 °C
-      : "bg-red-600"                      // rojo para ? 22 °C
+      : device.temp < 23.5
+      ? "bg-green-600"                    // verde para 20–23.4 °C
+      : "bg-red-600"                      // rojo para ? 23.5 °C
   }`}
                 >
                   <p className="text-sm">Temperatura</p>
