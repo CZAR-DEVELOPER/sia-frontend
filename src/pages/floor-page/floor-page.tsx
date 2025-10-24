@@ -1147,7 +1147,10 @@ const FloorPage: React.FC = () => {
     ]
   ];
   
-  switch (level) {
+
+  if(building === "B") {
+
+    switch (level) {
     case "1":
       currentMap = mapB1;
       currentMapHelper = mapHelperB1;
@@ -2262,13 +2265,29 @@ const FloorPage: React.FC = () => {
       currentMapPoints = [
       ];
       break;
-  }
+  }}else if (building === "E") {
+
+    /* 
+      switch (level) {  
+      case "1":
+        currentMap = mapE1;
+        currentMapHelper = mapHelperE1;
+        currentMapPoints = [];
+        break;
+      default:
+        currentMap = mapE1;
+        currentMapHelper = mapHelperE1;
+        currentMapPoints = [];
+        break;
+      }
+    */
+  
 
 
   //Hooks
   const [isEditing, setIsEditing] = React.useState(false);
   const  { devices, loading, error }= useGetAllVavDevices(parseInt(level ?? '0')); 
-  const [mapPointsState, setMapPointsState] = React.useState<Point[]>(currentMapPoints);
+  const [mapPointsState, setMapPointsState] = React.useState<Point[]>(currentMapPoints!);
   
  React.useEffect(() => {
     if (!loading && devices) {
@@ -2355,8 +2374,8 @@ const FloorPage: React.FC = () => {
         </div>
           ) : isEditing ? (
         <FloorMapEditorComponent
-          imageUrl={currentMapHelper}
-          currentPointsList={currentMapPoints}
+          imageUrl={currentMapHelper!}
+          currentPointsList={currentMapPoints!}
           onPointClick={(point) => {
             console.log(point);
           }}
@@ -2364,7 +2383,7 @@ const FloorPage: React.FC = () => {
           ) : (
         <FloorMapComponent
           pointsList={mapPointsState || []}
-          imageUrl={currentMap}
+          imageUrl={currentMap!}
           currentBuilding={building!}
           currentLevel={level!}
         ></FloorMapComponent>

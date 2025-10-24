@@ -18,21 +18,34 @@ const HomePage: React.FC = () => {
 
   //HOOKS
 
-  const [sidebarController, setSidebarController] = React.useState({id:"", isOpen: false, title: '', floors: [{name: "Piso 1", id: "1", isFloor: true, customUrl: ""}], closeButton: false});
-  const [mouseFollowerController, setMouseFollowerController] = React.useState({isVisible: false, label: ''});
+  const [sidebarController, setSidebarController] = React.useState({
+    id: "",
+    isOpen: false,
+    title: "",
+    floors: [{ name: "Piso 1", id: "1", isFloor: true, customUrl: "" }],
+    closeButton: false,
+  });
+  const [mouseFollowerController, setMouseFollowerController] = React.useState({
+    isVisible: false,
+    label: "",
+  });
 
   // GET JSON FROM BELOW URL AS AN EXAMPLE
   const areas = [
-    
     {
       id: "B",
-      label:"Edificio B",
+      label: "Edificio B",
       floors: [
-        {name: "Piso 1", id: "1", isFloor: true, customUrl: ''},
-        {name: "Piso 2", id: "2", isFloor: true, customUrl: ''},
-        {name: "Piso 3", id: "3", isFloor: true, customUrl: ''},
-        {name: "Piso 4", id: "4", isFloor: true, customUrl: ''},
-        {name: "Bombeo terciario", id: "Bombeo", isFloor: false, customUrl: '/pumps/3'},
+        { name: "Piso 1", id: "1", isFloor: true, customUrl: "" },
+        { name: "Piso 2", id: "2", isFloor: true, customUrl: "" },
+        { name: "Piso 3", id: "3", isFloor: true, customUrl: "" },
+        { name: "Piso 4", id: "4", isFloor: true, customUrl: "" },
+        {
+          name: "Bombeo terciario",
+          id: "Bombeo",
+          isFloor: false,
+          customUrl: "/pumps/3",
+        },
       ],
       shape: "poly",
       fillColor: "#ffffff40",
@@ -55,15 +68,29 @@ const HomePage: React.FC = () => {
         [675.12, 440.1],
         [597.5, 364.35],
       ],
-     
     },
     {
       id: "F",
-      label:"Edificio F",
+      label: "Edificio F",
       floors: [
-        {name: "Bombeo primario y secundario", id: "Bombeo", isFloor: false, customUrl: '/pumps/1,2'},
-        {name: "Chillers", id: "Chillers", isFloor: false,  customUrl: 'chillers'},
-        {name: "Torres de enfriamiento", id: "Torres de enfriamiento",  isFloor: false,  customUrl: 'cooling-towers'},
+        {
+          name: "Bombeo primario y secundario",
+          id: "Bombeo",
+          isFloor: false,
+          customUrl: "/pumps/1,2",
+        },
+        {
+          name: "Chillers",
+          id: "Chillers",
+          isFloor: false,
+          customUrl: "chillers",
+        },
+        {
+          name: "Torres de enfriamiento",
+          id: "Torres de enfriamiento",
+          isFloor: false,
+          customUrl: "cooling-towers",
+        },
       ],
       shape: "poly",
       name: "st1",
@@ -86,6 +113,42 @@ const HomePage: React.FC = () => {
       ],
       prefillColor: "red",
     },
+
+    {
+      id: "E",
+      label: "Edificio E",
+      floors: [
+        { name: "Piso 1", id: "1", isFloor: true, customUrl: "" },
+        { name: "Piso 2", id: "2", isFloor: true, customUrl: "" },
+        { name: "Piso 3", id: "3", isFloor: true, customUrl: "" },
+        { name: "Piso 4", id: "4", isFloor: true, customUrl: "" },
+      ],
+      shape: "poly",
+      name: "st0",
+      fillColor: "#ffffff80",
+      strokeColor: "white",
+      coords: [
+        597.5, 363.12, 438.5, 327.22, 427.34, 345.17, 365.91, 333.6, 289.33,
+        444.48, 305.29, 536.22, 578.9, 668.64, 629.95, 541.01, 675.42, 552.97,
+        675.42, 442.09, 641.92, 402, 652.29, 386.25, 597.5, 363.12,
+      ],
+      polygon: [
+        [597.5, 363.12],
+        [438.5, 327.22],
+        [427.34, 345.17],
+        [365.91, 333.6],
+        [289.33, 444.48],
+        [305.29, 536.22],
+        [578.9, 668.64],
+        [629.95, 541.01],
+        [675.42, 552.97],
+        [675.42, 442.09],
+        [641.92, 402],
+        [652.29, 386.25],
+        [597.5, 363.12],
+      ],
+      prefillColor: "red",
+    },
   ];
 
   const handleAreaClick = (area: MapArea) => {
@@ -93,17 +156,24 @@ const HomePage: React.FC = () => {
 
     //Fetch section Data
     const selectedArea = areas.find((a) => a.id === area.id);
-    
 
-    setSidebarController({id:selectedArea!.id, isOpen: true, title: selectedArea!.label, floors: selectedArea!.floors, closeButton: true});
+    setSidebarController({
+      id: selectedArea!.id,
+      isOpen: true,
+      title: selectedArea!.label,
+      floors: selectedArea!.floors,
+      closeButton: true,
+    });
   };
 
-  const updateLabelState = (area: MapArea, isVisible:boolean) => {
+  const updateLabelState = (area: MapArea, isVisible: boolean) => {
     //Fetch section Data
     const selectedArea = areas.find((a) => a.id === area.id);
-    
-    setMouseFollowerController({isVisible: isVisible, label: selectedArea!.label});
 
+    setMouseFollowerController({
+      isVisible: isVisible,
+      label: selectedArea!.label,
+    });
   };
 
   return (
@@ -140,7 +210,7 @@ const HomePage: React.FC = () => {
               responsive={true}
               parentWidth={parentWidth}
               natural={true}
-              imgProps={{draggable:false}}
+              imgProps={{ draggable: false }}
             />
           </div>
         </section>
@@ -156,15 +226,24 @@ const HomePage: React.FC = () => {
         title={sidebarController.title}
         closeButton={true}
         onCloseButton={() =>
-          setSidebarController({id:"", isOpen: false, title: "", floors:[], closeButton: false })
+          setSidebarController({
+            id: "",
+            isOpen: false,
+            title: "",
+            floors: [],
+            closeButton: false,
+          })
         }
       >
-      
         <p className="opacity-75 mb-4 ">Selecciona un area</p>
 
         {sidebarController.floors.map((floor) => (
           <Link
-            to={ floor.isFloor ? `/floor?building=${sidebarController.id}&level=${floor.id}`: floor.customUrl}
+            to={
+              floor.isFloor
+                ? `/floor?building=${sidebarController.id}&level=${floor.id}`
+                : floor.customUrl
+            }
             key={floor.id}
             className="btn btn-primary cursor-pointer flex flex-row items-center mb-2 hover:opacity-50"
             onClick={() => console.log(`Piso ${floor}`)}
