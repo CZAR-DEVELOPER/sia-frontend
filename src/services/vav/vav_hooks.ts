@@ -11,7 +11,7 @@ export interface VavDevice {
 }
 
 // Get all VAV devices for a specific floor
-export const useGetAllVavDevices = (floor: number) => {
+export const useGetAllVavDevices = (floor: number, level: string) => {
   const [devices, setDevices] = useState<VavDevice[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export const useGetAllVavDevices = (floor: number) => {
           status: string;
           data: { devices: VavDevice[] };
           timestamp: string;
-        }>(`http://10.1.38.171:1880/get/vav/B${floor}`);
+        }>(`http://10.1.38.171:1880/get/vav/${level + floor}`);
 
         setDevices(res.data.data.devices);
       } catch (err) {
@@ -44,7 +44,7 @@ export const useGetAllVavDevices = (floor: number) => {
 };
 
 // Get a specific VAV device by floor and device number
-export const useGetVavDevice = (floor: number, deviceNumber: number) => {
+export const useGetVavDevice = (floor: number, deviceNumber: number, level: string) => {
   const [device, setDevice] = useState<VavDevice | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export const useGetVavDevice = (floor: number, deviceNumber: number) => {
           status: string;
           data: { devices: VavDevice[] };
           timestamp: string;
-        }>(`http://10.1.38.171:1880/get/vav/B${floor}`);
+        }>(`http://10.1.38.171:1880/get/vav/${level + floor}`);
 
         const found = res.data.data.devices.find((d) => d.device === deviceNumber) || null;
         setDevice(found);

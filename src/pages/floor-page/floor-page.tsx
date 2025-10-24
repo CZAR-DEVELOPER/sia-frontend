@@ -2311,7 +2311,7 @@ const FloorPage: React.FC = () => {
 
   //Hooks
   const [isEditing, setIsEditing] = React.useState(false);
-  const  { devices, loading, error }= useGetAllVavDevices(parseInt(level ?? '0')); 
+  const  { devices, loading, error }= useGetAllVavDevices(parseInt(level ?? '0'), building ?? ''); 
   const [mapPointsState, setMapPointsState] = React.useState<Point[]>(currentMapPoints!);
   
  React.useEffect(() => {

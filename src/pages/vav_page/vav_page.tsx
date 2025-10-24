@@ -45,8 +45,12 @@ const VavPage: React.FC = () => {
   const building = searchParams.get("building"); // Obtén el parámetro "building"
   const section = searchParams.get("section"); // Obtén el parámetro "building"
 
-    // Hook VAVS
-  const { device, loading, error } = useGetVavDevice(level ? parseInt(level) : 0, section ? parseInt(section) : 0);
+  // Hook VAVS
+    const { device, loading, error } = useGetVavDevice(
+      level ? parseInt(level) : 0,
+      section ? parseInt(section) : 0,
+      building ?? ""
+    );
 
   React.useEffect(() => {
     if (!loading && device) {
