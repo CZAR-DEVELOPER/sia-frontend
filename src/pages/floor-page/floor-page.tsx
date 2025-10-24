@@ -9,6 +9,14 @@ import mapB1 from "../../assets/maps/B1.png";
 import mapB2 from "../../assets/maps/B2.png";
 import mapB3 from "../../assets/maps/B3.png";
 import mapB4 from "../../assets/maps/B4.png";
+import mapE1 from "../../assets/maps/E1.png";
+import mapE2 from "../../assets/maps/E2.png";
+import mapE3 from "../../assets/maps/E3.png";
+import mapE4 from "../../assets/maps/E4.png";
+import mapHelperE1 from "../../assets/maps_helpers/E1.png";
+import mapHelperE2 from "../../assets/maps_helpers/E2.png";
+import mapHelperE3 from "../../assets/maps_helpers/E3.png";
+import mapHelperE4 from "../../assets/maps_helpers/E4.png";
 import mapHelperB1 from "../../assets/maps_helpers/B1.png";
 import mapHelperB2 from "../../assets/maps_helpers/B2.png";
 import mapHelperB3 from "../../assets/maps_helpers/B3.png";
@@ -2265,13 +2273,28 @@ const FloorPage: React.FC = () => {
       currentMapPoints = [
       ];
       break;
-  }}else if (building === "E") {
-
-    /* 
+  } 
+  } else if (building === "E") {
+   
       switch (level) {  
       case "1":
         currentMap = mapE1;
         currentMapHelper = mapHelperE1;
+        currentMapPoints = [];
+        break;
+      case "2":
+        currentMap = mapE2;
+        currentMapHelper = mapHelperE2;
+        currentMapPoints = [];
+        break;
+      case "3":
+        currentMap = mapE3;
+        currentMapHelper = mapHelperE3;
+        currentMapPoints = [];
+        break;
+      case "4":
+        currentMap = mapE4;
+        currentMapHelper = mapHelperE4;
         currentMapPoints = [];
         break;
       default:
@@ -2280,7 +2303,9 @@ const FloorPage: React.FC = () => {
         currentMapPoints = [];
         break;
       }
-    */
+    
+  }
+    
   
 
 
