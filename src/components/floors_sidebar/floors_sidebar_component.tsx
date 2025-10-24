@@ -29,6 +29,18 @@ const FloorSidebarComponent: React.FC<FloorSidebarProps> = ({
       ],
     },
     {
+      name: "Edificio E",
+      id: "E",
+      floors: [
+        { name: "Piso 1", id: "1", isFloor: true, customUrl: '' },
+        { name: "Piso 2", id: "2", isFloor: true, customUrl: '' },
+        { name: "Piso 3", id: "3", isFloor: true, customUrl: '' },
+        { name: "Piso 4", id: "4", isFloor: true, customUrl: '' },
+        
+
+      ],
+    },
+    {
       name: "Edificio F",
       id: "F",
       floors: [
