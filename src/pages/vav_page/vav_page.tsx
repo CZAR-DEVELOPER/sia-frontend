@@ -424,6 +424,7 @@ const VavPage: React.FC = () => {
                 console.log("Enviando datos:", vavControllerState);
 
                 axios.post("http://10.1.38.171:1880/post/vav/act_stat", {
+                  edificio: building ?? "",
                   floor: level ?? "1",
                   device: section ?? "0",
                   Ap: 1,
