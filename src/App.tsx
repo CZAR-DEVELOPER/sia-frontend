@@ -27,17 +27,34 @@ const router = createBrowserRouter(
       path: '/vav',
       element: <VavPage />,
     },
-
     {
       path: '/chillers',
       element: <ChillersPage />,
     },
-
     {
       path: '/cooling-towers',
       element: <CoolingTowersPage />,
     },
-      {
+    // Rutas para "pumps" con "edificio" y "cuarto" como segmentos opcionales.
+    // Se listan las rutas más específicas primero para que coincidan correctamente:
+    // - /pumps/:numbers/:edificio/:cuarto
+    // - /pumps/:numbers/:edificio
+    // - /pumps/:numbers/:cuarto
+    // - /pumps/:numbers
+    // - /pumps
+    {
+      path: '/pumps/:numbers/:edificio/:cuarto',
+      element: <PumpingPage />,
+    },
+    {
+      path: '/pumps/:numbers/:edificio',
+      element: <PumpingPage />,
+    },
+    {
+      path: '/pumps/:numbers/:cuarto',
+      element: <PumpingPage />,
+    },
+    {
       path: '/pumps/:numbers',
       element: <PumpingPage />,
     },
@@ -45,8 +62,8 @@ const router = createBrowserRouter(
       path: '/pumps',
       element: <PumpingPage />,
     },
-  ],
-  {
+    ],
+    {
     future: {
       v7_relativeSplatPath: true, // Habilita la bandera para el nuevo comportamiento
     },

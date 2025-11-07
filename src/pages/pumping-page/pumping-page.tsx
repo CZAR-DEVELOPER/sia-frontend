@@ -29,6 +29,13 @@ const PumpingPage: React.FC = () => {
 
   //Get current value of 'cuarto' and 'edificio' from params
 
+  // Get 'edificio' from URL if present
+  const { edificio: edificioParam } = useParams<{ numbers?: string; edificio?: string }>();
+  const edificioFromPath = edificioParam ? decodeURIComponent(edificioParam) : undefined;
+
+  const { cuarto: cuartoParam } = useParams<{ numbers?: string; edificio?: string; cuarto?: string }>();
+  const cuartoFromPath = cuartoParam ? decodeURIComponent(cuartoParam) : undefined;
+
   // Determine 'cuarto' value based on pumps[0] using switch-case
   let cuarto = "";
   switch (pumps[0]) {
@@ -91,9 +98,12 @@ const PumpingPage: React.FC = () => {
     // Add other properties if needed
   }
 
+  const effectiveCuarto = cuartoFromPath ?? cuarto;
+  const effectiveEdificio = edificioFromPath ?? edificio;
+
   const { bombeo, loadingBombeo, errorBombeo } = useGetBombeo(
-    cuarto,
-    edificio
+    effectiveCuarto,
+    effectiveEdificio
   ) as {
     bombeo: BombeoData | undefined;
     loadingBombeo: boolean;
@@ -181,18 +191,19 @@ const PumpingPage: React.FC = () => {
 
       if (pumps[0] == 3) {
         setTerciario1State({
-          Cuarto: "CD",
-          Edificio: "C",
+          Cuarto: cuartoFromPath ?? "CD",
+          Edificio: edificioFromPath ?? "C",
           Bombeo: "1",
-          Comando: bombeo.bombeos?.[0]?.data.Comando === "Arranque" ? 1 : 0,
+          Comando:
+            bombeo.bombeos?.[0]?.data.Comando === "Arranque" ? 1 : 0,
           Frecuencia: isNaN(Number(bombeo.bombeos?.[0]?.data.Frecuencia))
             ? 0
             : Number(bombeo.bombeos?.[0]?.data.Frecuencia),
         });
 
         setTerciario2State({
-          Cuarto: "CD",
-          Edificio: "C",
+          Cuarto: cuartoFromPath ?? "CD",
+          Edificio: edificioFromPath ?? "C",
           Bombeo: "2",
           Comando: bombeo.bombeos?.[1]?.data.Comando === "Arranque" ? 1 : 0,
           Frecuencia: isNaN(Number(bombeo.bombeos?.[1]?.data.Frecuencia))
@@ -771,10 +782,11 @@ const PumpingPage: React.FC = () => {
 
                   {[terciario1State, terciario2State].map(
                     (terciarioState, idx) => (
-                      <div
-                        key={idx}
-                        className="grid grid-cols-[auto_1fr] items-center my-4 gap-4 w-full"
-                      >
+                      (bombeo?.bombeos?.length === 1 && idx === 1) ? null : (
+                        <div
+                          key={idx}
+                          className="grid grid-cols-[auto_1fr] items-center my-4 gap-4 w-full"
+                        >
                         <div className="self-start">
                           <AvatarComponent variant="light" size="large">
                             {idx + 1}
@@ -907,12 +919,7 @@ const PumpingPage: React.FC = () => {
                                 size="sm"
                                 disabled={isPostingData}
                                 onClick={async () => {
-                                  setisPostingData(true);
-                                  if (idx === 0) {
-                                    await postBombTer(terciario1State!);
-                                  } else if (idx === 1) {
-                                    await postBombTer(terciario2State!);
-                                  }
+
                                   // Wait 20 seconds before showing alert
                                   setTimeout(() => {
                                     setisPostingData(false);
@@ -920,7 +927,17 @@ const PumpingPage: React.FC = () => {
                                       "Actualizacion de estado solicitada exitosamente, espere unos minutos para ver los cambios (Si no se actualiza, refresque la pagina)"
                                     );
                                     window.location.reload();
-                                  }, 30000);
+                                  }, 20000);
+
+                                  setisPostingData(true);
+                                  console.log("Posting data for terciario", terciario1State);
+                                  if (idx === 0) {
+                                    await postBombTer(terciario1State!);
+                                  } else if (idx === 1) {
+                                    await postBombTer(terciario2State!);
+                                  }
+                                  
+                                  
                                 }}
                               >
                                 {isPostingData
@@ -932,7 +949,7 @@ const PumpingPage: React.FC = () => {
                         </div>
                       </div>
                     )
-                  )}
+                  ))}
                 </div>
               )}
             </section>

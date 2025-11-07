@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
         { name: "Piso 3", id: "3", isFloor: true, customUrl: "" },
         { name: "Piso 4", id: "4", isFloor: true, customUrl: "" },
         {
-          name: "Bombeo terciario",
+          name: "Bombeo terciario B",
           id: "Bombeo",
           isFloor: false,
           customUrl: "/pumps/3",
@@ -122,6 +122,12 @@ const HomePage: React.FC = () => {
         { name: "Piso 2", id: "2", isFloor: true, customUrl: "" },
         { name: "Piso 3", id: "3", isFloor: true, customUrl: "" },
         { name: "Piso 4", id: "4", isFloor: true, customUrl: "" },
+        {
+          name: "Bombeo terciario E",
+          id: "Bombeo",
+          isFloor: false,
+          customUrl: "/pumps/3/E/BE",
+        },
       ],
       shape: "poly",
       name: "st0",
